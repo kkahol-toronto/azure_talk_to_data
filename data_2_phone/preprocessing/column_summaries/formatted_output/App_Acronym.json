@@ -1,0 +1,7 @@
+{
+    "name": "App Acronym",
+    "Purpose": "The \"App Acronym\" column identifies the application associated with each record using a short, unique code or acronym. This enables users to quickly reference and group records by their corresponding applications, supporting efficient data analysis, filtering, and reporting.",
+    "Unique Values": "The column contains a wide range of unique acronyms representing different applications. Here are some examples:\n- ZAS\n- Estimator\n- XUI\n- XNet\n- vehdyn\n- XCC\n- WOW\n- WF1\n- WPX\n- WMA  \n...and many more (a total of 100+ unique values as provided).",
+    "Histogram": "",
+    "Insights": "The \"App Acronym\" column serves to uniquely identify the application for each record. Its values are application-specific codes, with some being much more frequent than others, as illustrated by the histogram. This column is valuable for categorizing and analyzing data by application."
+}

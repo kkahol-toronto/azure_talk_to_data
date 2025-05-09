@@ -1,0 +1,7 @@
+{
+    "name": "Dev Sec Ops %",
+    "Purpose": "The \"Dev Sec Ops %\" column likely represents the proportion or percentage of DevSecOps (Development, Security, and Operations) practices or adoption within a given context (e.g., team, project, or process). Values indicate the extent of DevSecOps integration, with 0.0 meaning no integration and 1.0 meaning full integration.",
+    "Unique Values": "- 0.0  \n- 0.25  \n- 0.5  \n- 0.75  \n- 1.0",
+    "Histogram": "",
+    "Insights": ""
+}

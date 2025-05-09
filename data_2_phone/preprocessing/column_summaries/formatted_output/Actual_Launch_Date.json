@@ -1,0 +1,7 @@
+{
+    "name": "Actual Launch Date",
+    "Purpose": "The \"Actual Launch Date\" column records the specific date (and time, though always 00:00:00) on which a product, project, or event was actually launched. This is crucial for tracking timelines, measuring delays or early completions against scheduled dates, and performing post-launch analysis.\n\n---",
+    "Unique Values": "The column contains 75 unique dates, each represented as a pandas `Timestamp`. These dates range from March 24, 2024, to March 15, 2025, indicating launches distributed over roughly a year.\n\nSample unique values:\n- 2024-03-24\n- 2024-05-22\n- 2024-07-31\n- 2024-11-30\n- 2025-03-15\n...and more.\n\n*(Full list available in your data above.)*\n\n---",
+    "Histogram": "",
+    "Insights": "This column is essential for understanding when actual launches occurred. Most launches are clustered around a few key dates, while the majority of dates have only a small number of launches. This pattern may reflect internal planning cycles, deadlines, or market-driven timing."
+}

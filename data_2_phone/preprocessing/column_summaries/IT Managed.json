@@ -1,0 +1,3 @@
+{
+    "IT Managed": "**Column Summary: IT Managed**\n\n- **Purpose:**  \n  Indicates whether IT management is in place for the corresponding record.\n\n- **Unique Values:**  \n  - Yes\n  - No\n  - -\n\n- **Histogram:**  \n  - Yes: 3,362  \n  - No: 335  \n  - - : 24"
+}

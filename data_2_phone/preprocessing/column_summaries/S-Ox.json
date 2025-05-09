@@ -1,0 +1,3 @@
+{
+    "S-Ox": "Summary of the S-Ox Column\n\nPurpose:  \nThe S-Ox column is used to classify records based on their status related to S-Ox (likely referring to a process, category, or regulatory requirement). It helps in identifying whether a record is associated with S-Ox and if so, whether it is in scope, out of scope, or pending classification.\n\nUnique Values:\n\n1. Non S-Ox\n2. S-Ox In Scope\n3. S-Ox Out of Scope\n4. S-Ox Classification Pending\n\nHistogram:\n\n- Non S-Ox: 3196\n- S-Ox In Scope: 447\n- S-Ox Out of Scope: 63\n- S-Ox Classification Pending: 8\n\nThis distribution shows that the majority of records are not related to S-Ox, with a smaller subset classified as in scope, out of scope, or pending determination."
+}

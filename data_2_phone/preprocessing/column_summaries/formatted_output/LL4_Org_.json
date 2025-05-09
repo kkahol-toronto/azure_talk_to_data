@@ -1,0 +1,7 @@
+{
+    "name": "LL4 (Org)",
+    "Purpose": "Identifies the Level 4 leader or organizational unit.\n-",
+    "Unique Values": "Over 100 distinct leader/unit codes.\n-",
+    "Histogram": "Highly skewed, with a few dominant values and a long tail of infrequent values.\n\nLet me know if you need a full list of all unique values or a chart visualization!",
+    "Insights": ""
+}

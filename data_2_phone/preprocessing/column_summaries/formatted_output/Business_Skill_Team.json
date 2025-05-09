@@ -1,0 +1,7 @@
+{
+    "name": "Business Skill Team",
+    "Purpose": "The \"Business Skill Team\" column categorizes employees or data entries by their primary business function or department within the organization. This classification helps in analyzing workforce distribution, resource allocation, and organizational structure by business specialization.",
+    "Unique Values": "There are 29 unique values in this column, representing various departments or teams, including:\n\n- Enterprise Technology\n- Advanced PD and Tech\n- Ford Credit Services\n- PD Operations and Quality\n- Human Resources\n- Manufacturing Engineering\n- Manufacturing Staffs\n- Supply Chain\n- Marketing & Sales\n- Quality\n- Ford Customer Service\n- New Model Programs\n- Finance\n- Policy\n- General Management\n- Ford Land\n- ENTERPRISE TECHNOLOGY (duplicate/case variation)\n- Information Technology\n- Manufacturing Plants\n- Integrated Services\n- Customer Experience\n- -\n- Communications\n- CUSTOMER EXPERIENCE (duplicate/case variation)\n- GDIA\n- ll (possible data entry error)\n- Not in EAMS\n- Product Development\n- Model E Customer\n- EPEO",
+    "Histogram": "",
+    "Insights": "This column helps segment the workforce or data entries according to business function, supporting organizational analysis and decision-making. However, attention should be given to standardizing values and addressing possible data inconsistencies."
+}

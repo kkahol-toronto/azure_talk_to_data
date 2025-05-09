@@ -1,0 +1,7 @@
+{
+    "name": "Infra. Decommission Status",
+    "Purpose": "This column indicates the current status of infrastructure decommissioning activities. It tracks whether a particular infrastructure component is scheduled for future decommissioning (\"Planned\") or the decommissioning process has already been completed (\"Complete\").\n\n-",
+    "Unique Values": "- Planned  \n  - Complete\n\n-",
+    "Histogram": "- Planned: 3,451 entries  \n  - Complete: 270 entries\n\nThis suggests that the majority of infrastructure items are still awaiting decommissioning, with a smaller subset already completed.",
+    "Insights": ""
+}

@@ -1,0 +1,3 @@
+{
+    "UAT %": "Summary for Column: UAT %\n\n**Purpose:**  \nThe \"UAT %\" column represents the percentage completion or success rate of User Acceptance Testing (UAT) for a given process, task, or item. It is used to track and assess how much of the required UAT has been accomplished or passed.\n\n**Unique Values:**  \n- 0.0 (0%)\n- 0.25 (25%)\n- 0.5 (50%)\n- 0.75 (75%)\n- 1.0 (100%)\n\n**Histogram:**  \n- 1.0 (100%): 233 occurrences\n- 0.75 (75%): 26 occurrences\n- 0.5 (50%): 12 occurrences\n- 0.25 (25%): 7 occurrences\n- 0.0 (0%): 23 occurrences\n\n**Interpretation:**  \nMost items (233 out of 301) have completed UAT (100%), while a smaller number are at various partial completion stages or have not started (0%). This suggests a high overall UAT completion rate."
+}

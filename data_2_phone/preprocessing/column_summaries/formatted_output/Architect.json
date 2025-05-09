@@ -1,0 +1,7 @@
+{
+    "name": "Architect",
+    "Purpose": "The 'Architect' column identifies the lead architect responsible for a given project, task, or entry within the dataset. It is used to track accountability, workload distribution, and contributions by individual architects.",
+    "Unique Values": "There are 99 unique architect identifiers in this column. Each value is a unique username or code representing a specific architect (e.g., 'RPRASA22', 'JLUCAS1', 'NMORALE7', etc.).",
+    "Histogram": "",
+    "Insights": ""
+}

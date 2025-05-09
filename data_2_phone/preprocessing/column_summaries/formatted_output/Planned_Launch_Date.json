@@ -1,0 +1,7 @@
+{
+    "name": "Planned Launch Date",
+    "Purpose": "The \"Planned Launch Date\" column records the scheduled date for a planned launch event. It is used to track and organize when each launch is expected to occur, supporting project management, scheduling, and progress tracking.",
+    "Unique Values": "There are 81 unique dates (Timestamps) in this column, each representing a specific planned launch date.\n\nSome example unique values include:\n- 2024-03-24\n- 2024-12-15\n- 2025-03-15\n- 2025-12-15\n- 2026-12-15\n- 2027-09-15\n(see the full list above for all dates)",
+    "Histogram": "",
+    "Insights": "The \"Planned Launch Date\" column is crucial for scheduling and tracking planned launches. Most launches are clustered around a few key dates (e.g., mid-December and mid-June across several years), likely reflecting major launch cycles or milestones, while many other dates have only a handful or a single planned launch. This distribution suggests both regular launch windows and occasional outliers."
+}

@@ -1,0 +1,7 @@
+{
+    "name": "Platform",
+    "Purpose": "The \"Platform\" column identifies the technological platform or environment associated with each record. This information is typically used to categorize, analyze, and manage systems or applications based on their underlying technology stack.",
+    "Unique Values": "The column contains the following unique values indicating different platforms:\n- VM\n- Mainframe\n- WAS\n- SQL\n- Java < v21\n- Java Struts\n- ESB\n- BO\n- Oracle\n- WebFocus - MF\n- Mainframe - DB2\n- Datastage\n- WebFocus\n- Focus - MF",
+    "Histogram": "",
+    "Insights": ""
+}

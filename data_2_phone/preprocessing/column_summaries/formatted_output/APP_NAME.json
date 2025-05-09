@@ -1,0 +1,7 @@
+{
+    "name": "APP NAME",
+    "Purpose": "Identifies software/applications referenced in each record.\n- **Count of unique values:** Large (dozens or more).\n- **Most common values:** FCSD Remanufacturing System, MyFordVehicles, GOaLS - Global Ordering and Logistics System, etc. (each appearing 7 times).\n- **Distribution:** Most values appear only a few times; a small number are more prominent.\n\nIf you need a visualization or a more detailed breakdown (such as a chart or a full list), please let me know!",
+    "Unique Values": "There are a large number of unique application names (examples include 'Zebra Android Scanner', 'X-Functional Tire Estimator', 'XUI-Cross Network Messaging User Interface', 'GOaLS - Global Ordering and Logistics System', 'FCSD Remanufacturing System', etc.). These names represent a diverse set of applications, each with a distinct function within the business.",
+    "Histogram": "",
+    "Insights": ""
+}

@@ -25,6 +25,9 @@ import io
 import requests
 from datetime import datetime
 import shutil
+from backend.data_processing import get_summary_response
+from backend.cosmodb_manager import add_request_response
+import uuid
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -104,79 +107,61 @@ def save_to_temp(content, prefix, extension):
     return filepath
 
 @app.post("/api/chat")
-async def chat(audio: UploadFile = File(...)):
-    """Accepts an audio file, transcribes it, generates a chat response, and returns TTS audio."""
+async def chat(audio: UploadFile = File(...), session_id: str = None):
+    """Accepts an audio file, transcribes it, generates a summary response, and returns TTS audio."""
     try:
         logger.info("Received audio file for processing")
-        
         # Read the uploaded audio file
         content = await audio.read()
-        
         # Save original audio
         original_audio_path = save_to_temp(content, "original_audio", "wav")
         logger.info(f"Saved original audio to: {original_audio_path}")
-        
         # Save the upload exactly as-is
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
             tmp.write(content)
             temp_audio_path = tmp.name
         logger.info(f"Saved audio file to: {temp_audio_path}")
-
         try:
             # Transcribe audio using Azure OpenAI Whisper
             whisper_url = (
                 "https://speechsupport.openai.azure.com/openai/deployments/whisper/"
                 "audio/transcriptions?api-version=2024-02-15-preview"
             )
-            
             headers = {
                 "api-key": os.getenv("AZURE_OPENAI_SPEECH_API_KEY")
-                # DO NOT set Content-Type here – requests will add it with a boundary
             }
-            
             logger.info("Attempting to transcribe audio with Whisper")
             with open(temp_audio_path, 'rb') as audio_file:
                 files = {
                     "file": ("audio.wav", audio_file, "audio/wav")
                 }
-                
-                data = {  # regular form fields go in `data`
+                data = {
                     "model": "whisper",
                     "response_format": "text"
-                    # "language": "en",  # optional language hint
                 }
-                
                 response = requests.post(
                     whisper_url,
                     headers=headers,
                     files=files,
                     data=data,
-                    timeout=60  # good practice
+                    timeout=60
                 )
-            
             if response.status_code == 200:
                 transcription = response.text
-                # Save transcription
                 transcription_path = save_to_temp(transcription, "transcription", "txt")
                 logger.info(f"Saved transcription to: {transcription_path}")
                 logger.info(f"Transcription successful: {transcription}")
             else:
                 logger.error(f"Transcription failed with status {response.status_code}: {response.text}")
                 raise Exception(f"Transcription failed: {response.text}")
-
-            # Get response from OpenAI
-            logger.info("Getting response from OpenAI")
-            response = chat_client.chat.completions.create(
-                model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant that engages in natural conversation."},
-                    {"role": "user", "content": transcription}
-                ]
-            )
-            chat_response = response.choices[0].message.content
-            logger.info("Received response from OpenAI")
-
-            # TTS via AOAI TTS endpoint
+            # Generate or use provided session_id
+            if not session_id:
+                session_id = str(uuid.uuid4())
+            # Get summary response from data_processing
+            summary_response = get_summary_response(transcription, session_id)
+            # Store request/response in CosmosDB
+            add_request_response(session_id, transcription, summary_response)
+            # TTS via AOAI TTS endpoint (use summary_response)
             tts_url = (
                 f"{os.getenv('AZURE_OPENAI_TTS_ENDPOINT').rstrip('/')}"
                 f"/openai/deployments/{os.getenv('AZURE_OPENAI_TTS_DEPLOYMENT_NAME')}"
@@ -190,19 +175,18 @@ async def chat(audio: UploadFile = File(...)):
             tts_payload = {
                 "model": "tts-1-hd",
                 "voice": "fable",
-                "input": chat_response
+                "input": summary_response
             }
             tts_response = requests.post(tts_url, headers=tts_headers, json=tts_payload, stream=True, timeout=60)
             tts_response.raise_for_status()
             audio_data = tts_response.content
             tts_audio_path = save_to_temp(audio_data, "tts_response", "wav")
-
             # Clean up temporary files
             os.unlink(temp_audio_path)
             logger.info("Cleaned up temporary files")
-
             return {
-                "response": chat_response,
+                "session_id": session_id,
+                "response": summary_response,
                 "audio": audio_data.hex(),
                 "transcription": transcription,
                 "files": {
@@ -211,14 +195,11 @@ async def chat(audio: UploadFile = File(...)):
                     "tts_audio": tts_audio_path
                 }
             }
-
         except Exception as e:
             logger.error(f"Error during processing: {str(e)}")
-            # Clean up temporary files in case of error
             if os.path.exists(temp_audio_path):
                 os.unlink(temp_audio_path)
             raise
-
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

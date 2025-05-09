@@ -1,0 +1,7 @@
+{
+    "name": "CIA",
+    "Purpose": "The CIA column appears to represent a categorical variable with coded values, likely indicating specific classifications, categories, or statuses in the dataset. The inclusion of values like '-' and '0' suggests the possibility of missing, unknown, or default entries.\n\n---",
+    "Unique Values": "There are 35 unique values in the CIA column:\n\n[111, 211, 222, 311, 221, 333, '-', 331, 232, 321, 231, 233, 212, 312, 313, 122, 322, 112, 11, 332, 223, 131, 133, 121, 323, 12, 113, 213, 22, 31, 21, 0, 132, 123, 23]\n\n---",
+    "Histogram": "",
+    "Insights": ""
+}

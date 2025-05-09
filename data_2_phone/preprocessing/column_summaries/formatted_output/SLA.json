@@ -1,0 +1,7 @@
+{
+    "name": "SLA",
+    "Purpose": "The SLA (Service Level Agreement) column categorizes each record based on the service tier or support level assigned. This classification typically reflects the quality, speed, or guarantees of service provided to customers.",
+    "Unique Values": "- Copper  \n- Silver  \n- Bronze  \n- Gold  \n- Platinum  \n- '-' (Unknown/Unspecified)",
+    "Histogram": "- Silver: 1,688  \n- Bronze: 860  \n- Copper: 599  \n- Gold: 506  \n- Platinum: 39  \n- '-': 22",
+    "Insights": ""
+}

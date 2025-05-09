@@ -1,0 +1,7 @@
+{
+    "name": "Actual Infra. Decommission Date",
+    "Purpose": "The \"Actual Infra. Decommission Date\" column records the specific dates when pieces of infrastructure were actually decommissioned (taken out of service). This is a critical field for tracking project progress, compliance, and resource management, ensuring that infrastructure retirement aligns with operational and strategic plans.",
+    "Unique Values": "There are 61 unique decommission dates in the column, ranging from March 24, 2024, to March 15, 2025. Each value represents a distinct date on which one or more infrastructure components were decommissioned.\n\nExample unique values:\n- 2024-03-24\n- 2024-06-29\n- 2024-07-07\n- 2024-08-05\n- 2024-09-17\n- ...\n- 2025-03-15",
+    "Histogram": "The most common decommission dates and their respective counts are:\n\n| Date           | Count |\n|----------------|-------|\n| 2025-01-31     | 39    |\n| 2024-12-15     | 33    |\n| 2025-02-28     | 26    |\n| 2024-12-23     | 12    |\n| 2025-01-15     | 11    |\n| 2025-01-06     | 9     |\n| 2025-01-20     | 8     |\n| 2024-11-25     | 7     |\n| ...            | ...   |\n| (other dates)  | ≤6    |",
+    "Insights": "- The column is used for tracking actual, not planned, decommission events.\n- There are a few peak dates suggesting coordinated infrastructure shutdowns or project phases.\n- The spread of unique dates allows for analysis of decommission patterns over time."
+}

@@ -1,0 +1,3 @@
+{
+    " Overall Status": "Summary of Column: Overall Status\n\nPurpose:  \nThe \"Overall Status\" column indicates the current progress stage of an item, task, or project. It helps track whether work has not begun, is ongoing, or is finished.\n\nUnique Values:  \n- Not Started  \n- In-Progress  \n- Complete  \n\nHistogram:  \n- Not Started: 2,927  \n- In-Progress: 461  \n- Complete: 333"
+}

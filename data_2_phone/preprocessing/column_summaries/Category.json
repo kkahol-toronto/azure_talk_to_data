@@ -1,0 +1,3 @@
+{
+    "Category": "**Summary of Column: Category**\n\n- **Purpose:**  \n  The Category column classifies each record based on its designated action or strategy, indicating whether it should be modernized or decommissioned.\n\n- **Unique Values:**  \n  - Modernize  \n  - Decommission\n\n- **Histogram:**  \n  - Modernize: 2,785  \n  - Decommission: 936"
+}

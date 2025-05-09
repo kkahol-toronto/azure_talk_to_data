@@ -1,0 +1,7 @@
+{
+    "name": "LL4+",
+    "Purpose": "The LL4+ column appears to represent user or staff identifiers, likely indicating which individual (such as an employee, analyst, or system user) is associated with a specific record or action in the dataset. This column is typically used to track responsibility, ownership, or activity attribution within an organization.",
+    "Unique Values": "There are 90 unique values in the column, each representing a distinct user or group. Examples include:  \nSKING68, JPITTERL, JMALETZ, OTHERS, JKOONS, MNOWICK1, TSWEEN16, SRUNSON, VVIJAY55, SARAUJO3, and others.",
+    "Histogram": "",
+    "Insights": ""
+}

@@ -1,0 +1,7 @@
+{
+    "name": "Platform Consolidation",
+    "Purpose": "The \"Platform Consolidation\" column categorizes data entries based on the underlying technology platform or environment used. It is likely used to track, analyze, or manage systems by their platform type, supporting efforts such as modernization, migration, or resource allocation.",
+    "Unique Values": "- VM  \n- Mainframe  \n- Java < v21  \n- SQL  \n- DA  \n- Oracle  \n- Mainframe - DB2",
+    "Histogram": "- VM: 1,141  \n- Java < v21: 983  \n- SQL: 670  \n- Mainframe: 349  \n- Oracle: 286  \n- DA: 194  \n- Mainframe - DB2: 95  \n\nThis distribution shows that \"VM\" and \"Java < v21\" are the most common platforms in the dataset, while \"Mainframe - DB2\" appears least frequently.",
+    "Insights": ""
+}

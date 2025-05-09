@@ -1,0 +1,7 @@
+{
+    "name": "PDO",
+    "Purpose": "The PDO column categorizes records by their respective departments, divisions, or project domains within the organization. It is typically used to group, filter, or analyze data based on organizational structure or functional areas.\n\n-",
+    "Unique Values": "- ISIT\n  - M&S TECH\n  - OCETO\n  - FORD CREDIT\n  - FORD PRO & FCSD TECH\n  - EPEO\n  - I-ERP\n  - EVDD\n  - GDIA\n  - EA\n  - OTHERS\n\n-",
+    "Histogram": "",
+    "Insights": "The PDO column is used for organizational grouping, with ISIT being the most frequent value and OTHERS the least. The distribution is skewed toward a few large categories, indicating key focus areas or larger departments."
+}

@@ -1,0 +1,7 @@
+{
+    "name": "Critical App",
+    "Purpose": "Indicates whether an application is considered critical (\"Yes\") or not (\"No\") within a given context (e.g., IT infrastructure, business operations).",
+    "Unique Values": "- No  \n- Yes",
+    "Histogram": "- No: 2,747  \n- Yes: 26",
+    "Insights": ""
+}

@@ -1,0 +1,7 @@
+{
+    "name": "Revision History Date & Comment",
+    "Purpose": "This column tracks changes made to the record, including the date of each revision and a brief comment describing what was updated. It serves as an audit trail for modifications over time.",
+    "Unique Values": "1. '3/3/2025 - Initial entry,  3/5/2025 - Updated the PDO timeline'\n2. datetime.datetime(2025, 3, 10, 0, 0)",
+    "Histogram": "- '3/3/2025 - Initial entry,  3/5/2025 - Updated the PDO timeline': 1  \n- datetime.datetime(2025, 3, 10, 0, 0): 1\n\n**Notes:**  \n- The column contains both string-formatted entries (with date and comment) and a datetime object, indicating inconsistent data formatting.  \n- Each unique value appears only once in the data.",
+    "Insights": "**Column Name:** Revision History Date & Comment"
+}
