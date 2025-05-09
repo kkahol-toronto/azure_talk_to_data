@@ -5,16 +5,15 @@ from datetime import datetime
 
 load_dotenv()
 
-COSMOS_CONN_STR = os.getenv("COSMON_DB_CONNECTION_STRING")
-COSMOS_DB_NAME = os.getenv("COSMON_DB_NAME", "talk2data")
-COSMOS_CONTAINER_NAME = os.getenv("COSMON_DB_CONTAINER", "sessions")
+COSMOS_CONN_STR = os.getenv("COSMO_DB_CONNECTION_STRING")
+COSMOS_DB_NAME = os.getenv("COSMO_DB_NAME", "talk2data")
+COSMOS_CONTAINER_NAME = os.getenv("COSMO_DB_CONTAINER", "conversations")
 
 client = CosmosClient.from_connection_string(COSMOS_CONN_STR)
 database = client.create_database_if_not_exists(id=COSMOS_DB_NAME)
 container = database.create_container_if_not_exists(
     id=COSMOS_CONTAINER_NAME,
-    partition_key=PartitionKey(path="/sessionID"),
-    offer_throughput=400
+    partition_key=PartitionKey(path="/sessionID")
 )
 
 def add_request_response(session_id, request_text, response_text, request_time=None, response_time=None):

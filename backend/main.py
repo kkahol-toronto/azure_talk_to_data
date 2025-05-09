@@ -25,8 +25,8 @@ import io
 import requests
 from datetime import datetime
 import shutil
-from backend.data_processing import get_summary_response
-from backend.cosmodb_manager import add_request_response
+from data_processing import get_summary_response
+from cosmodb_manager import add_request_response
 import uuid
 
 # Configure logging
@@ -78,6 +78,8 @@ try:
 except Exception as e:
     logger.error(f"Failed to initialize TTS config: {str(e)}")
     raise
+
+logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
 
 def save_to_temp(content, prefix, extension):
     """Save content to a file in the temp directory with timestamp and maintain only last 10 files"""

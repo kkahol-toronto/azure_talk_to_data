@@ -1,0 +1,26 @@
+.particle-cloud-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  width: 100%;
+}
+
+.cloud-breath {
+  transform-origin: 40px 40px;
+  animation: cloud-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes cloud-breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+.particle {
+  filter: drop-shadow(0 2px 6px rgba(108, 99, 255, 0.25));
+  transition: fill 0.3s;
+} 

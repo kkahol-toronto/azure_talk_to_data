@@ -1,12 +1,16 @@
 import os
 from dotenv import load_dotenv
 from openai import AzureOpenAI
-from backend.cosmodb_manager import get_last_n_pairs
+from cosmodb_manager import get_last_n_pairs
 import sys
 import importlib.util
 import re
 
 load_dotenv()
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 # Dynamically import query_engine.py from data_2_phone/preprocessing
 QUERY_ENGINE_PATH = os.path.join(os.path.dirname(__file__), '../data_2_phone/preprocessing/query_engine.py')
@@ -30,7 +34,6 @@ DEFAULT_PROMPT = (
     "Generated SQL:\n{{sql}}\n\n"
     "SQL Answer:\n{{answer}}"
 )
-PROMPT_TEMPLATE = os.getenv("SPOKEN_ANSWER_SUMMARY_GENERATION_PROMPT", DEFAULT_PROMPT)
 
 # Initialize OpenAI client
 client = AzureOpenAI(
@@ -56,12 +59,19 @@ def get_summary_response(user_query, session_id):
         f"User: {q['text']}\nAssistant: {a['text']}" for q, a in history_pairs
     ])
 
-    # Step 3: Build prompt using double curly braces
-    prompt = PROMPT_TEMPLATE
+    # Step 3: Always reload .env and fetch prompt template
+    load_dotenv(override=True)
+    prompt_template = os.getenv("SPOKEN_ANSWER_SUMMARY_GENERATION_PROMPT", DEFAULT_PROMPT)
+    prompt = prompt_template
     prompt = re.sub(r"{{conversation_history}}", history_str, prompt)
     prompt = re.sub(r"{{user_query}}", user_query, prompt)
     prompt = re.sub(r"{{sql}}", sql, prompt)
     prompt = re.sub(r"{{answer}}", sql_answer, prompt)
+
+    # Write the final prompt to a file for debugging
+    prompt_path = os.path.join(os.path.dirname(__file__), "prompt.txt")
+    with open(prompt_path, "w", encoding="utf-8") as f:
+        f.write(prompt)
 
     # Step 4: Call LLM
     response = client.chat.completions.create(

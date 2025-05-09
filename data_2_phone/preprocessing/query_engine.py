@@ -4,13 +4,13 @@ import glob
 import sqlite3
 import re
 from dotenv import load_dotenv
-from process_excel import call_llm
+from data_2_phone.preprocessing.process_excel import call_llm
 
 # Load environment variables
 load_dotenv()
 
 # Constants
-DB_FILE = "data_2_phone/data/database.sqlite"
+DB_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "database.sqlite"))
 TABLE_NAME = "applications"
 
 def load_column_descriptions(max_tokens=900000):
@@ -138,6 +138,21 @@ def process_natural_language_query(nl_query):
             "error": "Could not extract SQL query from LLM response",
             "full_response": response
         }
+
+def get_sql_and_answer(nl_query):
+    """
+    Given a natural language query, return (sql_query, sql_answer_str)
+    """
+    result = process_natural_language_query(nl_query)
+    if "sql" in result and "results" in result and result["results"]["success"]:
+        sql_query = result["sql"]
+        sql_answer = json.dumps(result["results"]["results"], indent=2)
+        print("[DEBUG] Generated SQL Query:\n", sql_query)
+        print("[DEBUG] SQL Answer/Response:\n", sql_answer)
+        return sql_query, sql_answer
+    else:
+        print("[DEBUG] SQL generation or execution failed:", result.get('error', 'Unknown error'))
+        return "", f"Error: {result.get('error', 'Unknown error')}"
 
 if __name__ == "__main__":
     # Check if database exists, if not suggest running excel_to_sqlite.py first
