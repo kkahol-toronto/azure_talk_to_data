@@ -1,0 +1,7 @@
+{
+    "name": "Baseline Date",
+    "Purpose": "The \"Baseline Date\" column records the specific date that serves as a starting reference point (baseline) for an event, measurement, or process in the dataset. It is typically used for tracking progress, comparisons, or time-based calculations relative to this date.",
+    "Unique Values": "There are 66 unique date values in the column, ranging from 2024 to 2027. Each value is a timestamp representing a specific day.\n\n**Unique Values List (sample):**\n- 2024-03-24\n- 2024-06-19\n- 2024-09-12\n- 2025-03-11\n- 2025-12-15\n- 2027-12-15\n- (and more...)",
+    "Histogram": "",
+    "Insights": "The \"Baseline Date\" column is critical for temporal analysis, with a small set of standard dates accounting for most records, and a long tail of unique, infrequently used dates."
+}

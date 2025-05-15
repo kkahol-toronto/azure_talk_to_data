@@ -1,0 +1,7 @@
+{
+    "name": "IT Managed",
+    "Purpose": "Indicates whether IT management is in place for the corresponding record.\n\n-",
+    "Unique Values": "- Yes\n  - No\n  - -\n\n-",
+    "Histogram": "- Yes: 3,362  \n  - No: 335  \n  - - : 24",
+    "Insights": ""
+}

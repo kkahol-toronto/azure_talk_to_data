@@ -1,0 +1,3 @@
+{
+    "Java Apps - Type": "**Column Summary:**\n\n- **Purpose:**  \n  The \"Java Apps - Type\" column categorizes Java-based applications by their framework or platform type within the dataset. This classification helps in analyzing the distribution and prevalence of different Java application technologies.\n\n- **Unique Values:**  \n  - Springboot\n  - WAS\n  - Java Struts\n  - MF - WAS Liberty\n  - Java\n\n- **Histogram:**  \n  - Springboot: 380\n  - WAS: 15\n  - MF - WAS Liberty: 9\n  - Java Struts: 5\n  - Java: 1"
+}

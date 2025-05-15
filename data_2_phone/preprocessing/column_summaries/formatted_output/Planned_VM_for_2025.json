@@ -1,0 +1,7 @@
+{
+    "name": "Planned VM for 2025",
+    "Purpose": "This column indicates the planned number of Virtual Machines (VMs) to be deployed or utilized in the year 2025 for each record or entity in the dataset. It helps track and forecast resource allocation for future infrastructure planning.",
+    "Unique Values": "[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 8.0]",
+    "Histogram": "- 0.0: 2 records\n- 1.0: 2 records\n- 2.0: 2 records\n- 3.0: 1 record\n- 4.0: 2 records\n- 5.0: 2 records\n- 8.0: 1 record\n\nThis distribution shows that most planned VM counts are between 0 and 5, with a single record each for 3 and 8 VMs.",
+    "Insights": ""
+}

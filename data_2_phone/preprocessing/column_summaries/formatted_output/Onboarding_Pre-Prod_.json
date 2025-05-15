@@ -1,0 +1,7 @@
+{
+    "name": "Onboarding Pre-Prod %",
+    "Purpose": "This column represents the completion percentage of the onboarding process for the pre-production environment. It tracks the progress of each entry, indicating how much of the onboarding steps have been completed before moving to production.",
+    "Unique Values": "- 0.0  \n- 0.25  \n- 0.5  \n- 0.75  \n- 1.0",
+    "Histogram": "- 1.0: 272 entries (fully completed)\n- 0.25: 39 entries (25% completed)\n- 0.5: 22 entries (50% completed)\n- 0.0: 9 entries (not started)\n- 0.75: 5 entries (75% completed)",
+    "Insights": ""
+}

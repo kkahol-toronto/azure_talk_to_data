@@ -1,0 +1,7 @@
+{
+    "name": "Job Count / Report Count / VM Count",
+    "Purpose": "This column represents a count\u2014either the number of jobs, reports, or virtual machines (VMs) associated with a particular record, depending on the dataset context. It quantifies how many items of the specified type are linked to each entry, which is useful for understanding workload distribution, resource allocation, or reporting frequency.\n\n---",
+    "Unique Values": "There are a wide range of unique values, mostly integers (from 0 up to several thousand), along with a blank value (' '). The values include very small numbers (0, 1, 2, etc.), moderate numbers (10\u2013100), and some very large outliers (e.g., 1589, 4523, 6221). The blank value likely represents missing or undefined data.\n\n---",
+    "Histogram": "",
+    "Insights": ""
+}

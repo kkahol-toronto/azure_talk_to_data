@@ -1,0 +1,17 @@
+.recording-bars-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100px;
+  width: 100%;
+  gap: 6px;
+}
+
+.recording-bar {
+  width: 10px;
+  background: linear-gradient(180deg, var(--bar-color, #6c63ff) 60%, #a3a1fb 100%);
+  border-radius: 6px 6px 2px 2px;
+  transition: height 0.15s cubic-bezier(0.4, 0.2, 0.2, 1), background 0.2s;
+  min-height: 20px;
+  max-height: 80px;
+} 

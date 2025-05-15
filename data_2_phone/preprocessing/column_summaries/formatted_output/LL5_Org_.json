@@ -1,0 +1,7 @@
+{
+    "name": "LL5 (Org)",
+    "Purpose": "Identifies the LL5 (Org) leader or unit responsible for a data entry.\n- **Number of Unique Values:** 100+\n- **Most Frequent Value:** RCORDEI1 (130 occurrences)\n- **Distribution:** Highly skewed; a small number of leaders/units account for most of the data, while the majority represent smaller groups.\n\nIf you need a graphical histogram or more detailed breakdown, please specify!",
+    "Unique Values": "There are 100+ unique values in this column. Each value is a code or identifier (e.g., 'RCORDEI1', 'DWIERZBI', 'BGANESH') representing a different leader or organizational unit.",
+    "Histogram": "",
+    "Insights": ""
+}

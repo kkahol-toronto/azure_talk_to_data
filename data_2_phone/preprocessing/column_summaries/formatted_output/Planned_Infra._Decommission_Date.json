@@ -1,0 +1,7 @@
+{
+    "name": "Planned Infra. Decommission Date",
+    "Purpose": "Schedules future infrastructure removal or replacement.\n-",
+    "Unique Values": "88 unique planned dates/times.\n- **Distribution:** Highly skewed; most assets are scheduled for decommission on a handful of dates, with a long tail of less common and possibly erroneous entries.\n\n**Recommendation:**  \nReview entries with unusual dates (e.g., 1900-03-30, time-only 00:00) for data quality. Consider normalizing or flagging these for further investigation.",
+    "Histogram": "",
+    "Insights": ""
+}

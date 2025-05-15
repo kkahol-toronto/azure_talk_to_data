@@ -1,0 +1,3 @@
+{
+    "Onboarding Prod %": "Summary of Column: Onboarding Prod %\n\n- **Purpose:**  \n  The \"Onboarding Prod %\" column likely represents the percentage completion or progress of a product's onboarding process for each record. It quantifies how far along a user, account, or entity is in completing the onboarding steps, with values ranging from 0% (not started) to 100% (fully completed).\n\n- **Unique Values:**  \n  - 0.0\n  - 0.25\n  - 0.5\n  - 0.75\n  - 1.0\n\n- **Histogram:**  \n  - 1.0: 243 entries\n  - 0.0: 24 entries\n  - 0.75: 17 entries\n  - 0.5: 9 entries\n  - 0.25: 3 entries\n\nThis distribution indicates that most records (243) have fully completed onboarding (100%), while a smaller number are at partial or no completion stages."
+}

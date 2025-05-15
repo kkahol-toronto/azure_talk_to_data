@@ -1,0 +1,3 @@
+{
+    "Critical App": "**Column Name:** Critical App\n\n**Purpose:**  \nIndicates whether an application is considered critical (\"Yes\") or not (\"No\") within a given context (e.g., IT infrastructure, business operations).\n\n**Unique Values:**  \n- No  \n- Yes\n\n**Histogram:**  \n- No: 2,747  \n- Yes: 26"
+}

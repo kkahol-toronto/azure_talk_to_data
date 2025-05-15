@@ -1,0 +1,7 @@
+{
+    "name": "S-Ox Milestone",
+    "Purpose": "This column indicates whether a specific S-Ox milestone has been achieved for each record. It is a binary categorical variable used to track milestone completion status.",
+    "Unique Values": "- 'No'  \n- 'Yes'",
+    "Histogram": "- No: 2,791  \n- Yes: 11",
+    "Insights": ""
+}
