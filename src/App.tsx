@@ -2,6 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import ParticleCloud from "./ParticleCloud";
 import RecordingBars from "./RecordingBars";
 
+// Add global declarations at the top of the file
+declare global {
+  interface Window {
+    _audioController: { intercept: () => void } | null;
+  }
+}
+
+// Initialize controller
+if (typeof window !== 'undefined') {
+  window._audioController = null;
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -26,9 +38,15 @@ function App() {
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const playbackContextRef = useRef<AudioContext | null>(null);
+  const playbackSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const playbackAudioContextRef = useRef<AudioContext | null>(null);
+  const playbackOscillatorRef = useRef<AudioScheduledSourceNode | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const isRecordingRef = useRef(false);
   const [barVolumes, setBarVolumes] = useState(Array(8).fill(0));
+  const isTTSStoppedRef = useRef(false);
+  const [audioKey, setAudioKey] = useState(0);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,18 +63,43 @@ function App() {
     // Cleanup on unmount
     return () => {
       stopListening();
-      stopPlayback();
+      hardStopAudio();
     };
     // eslint-disable-next-line
   }, []);
 
-  const stopPlayback = () => {
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.pause();
-      audioPlayerRef.current.currentTime = 0;
-      audioPlayerRef.current.src = '';
-      audioPlayerRef.current.onended = null;
+  const hardStopAudio = () => {
+    console.log('Hard stopping all audio');
+
+    // Use intercept method if available
+    if (window._audioController) {
+      try {
+        window._audioController.intercept();
+        window._audioController = null;
+      } catch (e) {
+        console.error('Error intercepting audio:', e);
+      }
     }
+
+    // Also stop any HTML audio playing through audio element
+    if (audioPlayerRef.current) {
+      try {
+        const audio = audioPlayerRef.current;
+        audio.onended = null; 
+        audio.onerror = null;
+        audio.onpause = null;
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = '';
+        audio.load();
+      } catch (e) {
+        console.log('Error stopping HTML audio:', e);
+      }
+    }
+
+    // Make sure we're in the right state
+    isTTSStoppedRef.current = true;
+    console.log('All audio stopped');
   };
 
   const stopListening = () => {
@@ -81,6 +124,7 @@ function App() {
 
   const SPEECH_THRESHOLD = 0.02;
   const MIN_SPEECH_BUFFERS = 6; // ~250ms if buffer is ~46ms
+  const INTERRUPT_THRESHOLD = 0.03; // Higher threshold for interruption to avoid false positives
   let speechBufferCount = 0;
 
   const startListening = async () => {
@@ -101,10 +145,9 @@ function App() {
 
       processor.onaudioprocess = (event) => {
         const inputData = event.inputBuffer.getChannelData(0);
-        // Calculate RMS energy for VAD
         const rms = Math.sqrt(inputData.reduce((sum, sample) => sum + sample * sample, 0) / inputData.length);
-
-        // Calculate 8 band volumes for animation
+        
+        // Set bar volumes for visualization
         const bandSize = Math.floor(inputData.length / 8);
         const bands = Array(8).fill(0).map((_, i) => {
           const start = i * bandSize;
@@ -115,19 +158,51 @@ function App() {
         });
         setBarVolumes(bands);
 
-        if (rms > SPEECH_THRESHOLD) {
-          if (status !== 'listening') setStatus('listening');
-          speechBufferCount += 1;
-        } else {
-          speechBufferCount = 0;
-        }
-
-        if (speechBufferCount >= MIN_SPEECH_BUFFERS && !isRecordingRef.current) {
-          setIsRecording(true);
-          isRecordingRef.current = true;
+        // Interrupt TTS if speech detected
+        if (status === 'speaking' && rms > INTERRUPT_THRESHOLD) {
+          console.log('Interrupt condition met:', { status, rms });
+          console.log(`INTERRUPT DETECT: Very strong speech detected (${rms.toFixed(4)}) during bot speech!`);
+          if (audioPlayerRef.current) {
+            try {
+              console.log('Before pause:', {
+                paused: audioPlayerRef.current.paused,
+                currentTime: audioPlayerRef.current.currentTime,
+                src: audioPlayerRef.current.src
+              });
+              audioPlayerRef.current.pause();
+              audioPlayerRef.current.currentTime = 0;
+              audioPlayerRef.current.src = '';
+              audioPlayerRef.current.load();
+              console.log('After pause:', {
+                paused: audioPlayerRef.current.paused,
+                currentTime: audioPlayerRef.current.currentTime,
+                src: audioPlayerRef.current.src
+              });
+            } catch (e) { console.error('Error stopping audioPlayerRef on VAD interrupt:', e); }
+          }
+          setStatus('listening');
           stopListening();
           startRecording();
-          speechBufferCount = 0; // reset after triggering
+          return;
+        }
+        
+        // Regular speech detection for starting recording
+        if (rms > SPEECH_THRESHOLD) {
+          speechBufferCount++;
+          
+          // If we have enough speech buffers, start recording
+          if (speechBufferCount >= MIN_SPEECH_BUFFERS && !isRecordingRef.current) {
+            console.log(`Starting recording after ${speechBufferCount} speech buffers`);
+            setIsRecording(true);
+            isRecordingRef.current = true;
+            stopListening();
+            startRecording();
+            speechBufferCount = 0;
+          } else if (status !== 'listening' && status !== 'processing') {
+            setStatus('listening');
+          }
+        } else {
+          speechBufferCount = 0;
         }
       };
     } catch (error) {
@@ -136,6 +211,17 @@ function App() {
   };
 
   const startRecording = () => {
+    // Always stop TTS playback when recording starts
+    if (audioPlayerRef.current) {
+      try {
+        console.log('Force stopping audioPlayerRef because recording is starting...');
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current.currentTime = 0;
+        audioPlayerRef.current.src = '';
+        audioPlayerRef.current.load();
+        console.log('AudioPlayerRef stopped due to recording start.');
+      } catch (e) { console.error('Error stopping audioPlayerRef on recording start:', e); }
+    }
     stopListening(); // ensure all previous VAD is cleaned up
     setStatus('listening');
     setIsRecording(true);
@@ -201,31 +287,135 @@ function App() {
     }
   };
 
-  const playAudioResponse = (audioHex: string) => {
-    setStatus('speaking');
-    // Convert hex to binary
-    const binary = new Uint8Array(audioHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
-    const blob = new Blob([binary], { type: 'audio/wav' });
-    const url = URL.createObjectURL(blob);
-
+  // Most aggressive audio stop possible
+  const nuclearlySilenceAudio = () => {
+    console.log('NUCLEAR OPTION: Forcefully silencing all audio');
+    
+    // 1. Try to stop any playing audio elements first (safely)
+    try {
+      document.querySelectorAll('audio').forEach(audio => {
+        try {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.src = '';
+          
+          // Don't try to remove from DOM - that's React's job
+          // if (audio.parentNode && !audio.hasAttribute('ref')) {
+          //   audio.parentNode.removeChild(audio);
+          // }
+        } catch (e) {
+          console.error('Error silencing audio:', e);
+        }
+      });
+    } catch (e) {
+      console.error('Error with document query:', e);
+    }
+    
+    // 2. Kill our current audio reference
     if (audioPlayerRef.current) {
-      // Stop and reset before playing new audio
-      audioPlayerRef.current.pause();
-      audioPlayerRef.current.currentTime = 0;
-      audioPlayerRef.current.src = '';
-      audioPlayerRef.current.onended = null;
+      try {
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current.currentTime = 0;
+        audioPlayerRef.current.src = '';
+      } catch (e) {
+        console.error('Error with audio ref:', e);
+      }
+    }
+    
+    // 3. Trigger remount of audio element by changing key
+    setAudioKey(prev => prev + 1);
+    
+    // 4. Set the stopped flag
+    isTTSStoppedRef.current = true;
+    
+    // 5. Try to use Web Audio API context closing as well
+    if (typeof window !== 'undefined' && window._audioController) {
+      try {
+        window._audioController.intercept();
+        window._audioController = null;
+      } catch (e) {
+        console.error('Error with audio controller:', e);
+      }
+    }
+    
+    // 6. Log success
+    console.log('Audio should now be forcefully stopped');
+  };
 
-      // Set new source and play
-      audioPlayerRef.current.src = url;
-      audioPlayerRef.current.play();
-      audioPlayerRef.current.onended = () => {
-        setStatus('waiting');
+  // Utility: log every setStatus call with stack trace
+  const setStatusWithLog = (newStatus: 'waiting' | 'listening' | 'speaking' | 'processing') => {
+    if (status !== newStatus) {
+      console.log(`setStatus called: ${status} -> ${newStatus}`);
+      console.trace('setStatus stack trace');
+    }
+    setStatus(newStatus);
+  };
+
+  const playAudioResponse = (audioHex: string) => {
+    setStatusWithLog('speaking');
+    isTTSStoppedRef.current = false;
+    console.log('Beginning TTS audio playback preparation...');
+    console.log('TTS audioHex length:', audioHex.length);
+    console.log('TTS audioHex sample (first 20 bytes):', audioHex.slice(0, 40));
+
+    // Stop any previous playback
+    if (audioPlayerRef.current) {
+      try {
+        console.log('Pausing and resetting audioPlayerRef due to new TTS playback...');
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current.currentTime = 0;
+        audioPlayerRef.current.src = '';
+      } catch (e) { console.error('Error stopping previous audioPlayerRef:', e); }
+    }
+
+    try {
+      // Convert hex to binary
+      const binary = new Uint8Array(audioHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+      console.log('Binary length:', binary.length, 'First 20 bytes:', Array.from(binary.slice(0, 20)));
+      const blob = new Blob([binary], { type: 'audio/wav' });
+      const url = URL.createObjectURL(blob);
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.src = url;
+        audioPlayerRef.current.onended = () => {
+          console.log('TTS audio element ended.');
+          setStatusWithLog('waiting');
+          startListening();
+          URL.revokeObjectURL(url);
+        };
+        audioPlayerRef.current.onerror = (e) => {
+          console.error('TTS audio element error:', e);
+          setStatusWithLog('waiting');
+          startListening();
+          URL.revokeObjectURL(url);
+        };
+        audioPlayerRef.current.play().then(() => {
+          console.log('TTS audio element playback started.');
+        }).catch(e => {
+          console.error('TTS audio element playback failed:', e);
+          setStatusWithLog('waiting');
+          startListening();
+          URL.revokeObjectURL(url);
+        });
+      } else {
+        console.error('No audio player reference found');
+        setStatusWithLog('waiting');
         startListening();
-      };
+      }
+    } catch (error) {
+      console.error('Error in playAudioResponse:', error);
+      setStatusWithLog('waiting');
+      startListening();
     }
   };
 
-  console.log("isRecording:", isRecording, "status:", status);
+  // Add logging for state transitions
+  useEffect(() => {
+    if (status === 'speaking') {
+      console.log('Status changed to speaking: TTS playback should be active');
+    } else {
+      console.log('Status changed:', status);
+    }
+  }, [status]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -267,14 +457,15 @@ function App() {
           {status === 'waiting' && <RecordingBars animate color="purple" key="waiting" />}
           {status === 'listening' && <RecordingBars key="listening" volumes={barVolumes} color="purple" />}
           {status === 'processing' && <RecordingBars animate color="green" key="processing" />}
-          {loading && status !== 'processing' && status !== 'listening' && status !== 'waiting' && <ParticleCloud />}
+          {status === 'speaking' && <RecordingBars animate color="#e75480" key="speaking" />}
+          {loading && status !== 'processing' && status !== 'listening' && status !== 'waiting' && status !== 'speaking' && <ParticleCloud />}
           <div className="text-center mt-4 text-gray-600">
             {status === 'waiting' && 'Waiting for Input...'}
             {status === 'listening' && 'Listening...'}
             {status === 'processing' && 'Processing your message...'}
             {status === 'speaking' && 'Bot is speaking...'}
           </div>
-          <audio ref={audioPlayerRef} className="hidden" />
+          <audio key={audioKey} ref={audioPlayerRef} className="hidden" />
         </div>
       </div>
     </div>

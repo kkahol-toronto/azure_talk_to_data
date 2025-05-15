@@ -28,6 +28,7 @@ import shutil
 from data_processing import get_summary_response
 from cosmodb_manager import add_request_response
 import uuid
+import subprocess
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -184,6 +185,33 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
             tts_response.raise_for_status()
             audio_data = tts_response.content
             tts_audio_path = save_to_temp(audio_data, "tts_response", "wav")
+
+            # Check if the file is PCM WAV, and convert if not
+            def is_pcm_wav(filepath):
+                try:
+                    with wave.open(filepath, 'rb') as wf:
+                        return wf.getcomptype() == 'NONE'
+                except Exception as e:
+                    logger.warning(f"Could not check WAV type: {e}")
+                    return False
+
+            if not is_pcm_wav(tts_audio_path):
+                logger.info(f"TTS file {tts_audio_path} is not PCM WAV. Converting with ffmpeg...")
+                converted_path = tts_audio_path.replace('.wav', '_converted.wav')
+                ffmpeg_cmd = [
+                    'ffmpeg', '-y', '-i', tts_audio_path,
+                    '-ar', '16000', '-ac', '1', '-c:a', 'pcm_s16le', converted_path
+                ]
+                try:
+                    subprocess.run(ffmpeg_cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    with open(converted_path, 'rb') as f:
+                        audio_data = f.read()
+                    tts_audio_path = converted_path
+                    logger.info(f"TTS file converted to PCM WAV: {converted_path}")
+                except Exception as e:
+                    logger.error(f"ffmpeg conversion failed: {e}")
+                    # fallback: use original audio_data
+
             # Clean up temporary files
             os.unlink(temp_audio_path)
             logger.info("Cleaned up temporary files")
