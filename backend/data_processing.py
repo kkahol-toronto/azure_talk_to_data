@@ -35,6 +35,11 @@ DEFAULT_PROMPT = (
     "SQL Answer:\n{{answer}}"
 )
 
+MAX_PROMPT_TOKENS = 1_000_000
+
+def estimate_tokens(text):
+    return len(text) // 4
+
 # Initialize OpenAI client
 client = AzureOpenAI(
     api_version=API_VERSION,
@@ -62,11 +67,37 @@ def get_summary_response(user_query, session_id):
     # Step 3: Always reload .env and fetch prompt template
     load_dotenv(override=True)
     prompt_template = os.getenv("SPOKEN_ANSWER_SUMMARY_GENERATION_PROMPT", DEFAULT_PROMPT)
-    prompt = prompt_template
-    prompt = re.sub(r"{{conversation_history}}", history_str, prompt)
-    prompt = re.sub(r"{{user_query}}", user_query, prompt)
-    prompt = re.sub(r"{{sql}}", sql, prompt)
-    prompt = re.sub(r"{{answer}}", sql_answer, prompt)
+    # Use str.format for prompt substitution to avoid regex escape issues
+    prompt = prompt_template.format(
+        conversation_history=history_str,
+        user_query=user_query,
+        sql=sql,
+        answer=sql_answer
+    )
+
+    if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
+        # Remove conversation history
+        prompt = prompt_template.format(
+            conversation_history="",
+            user_query=user_query,
+            sql=sql,
+            answer=sql_answer
+        )
+    if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
+        # Truncate SQL answer if still too long
+        allowed_answer_len = MAX_PROMPT_TOKENS * 4 - len(prompt_template.format(
+            conversation_history="",
+            user_query=user_query,
+            sql=sql,
+            answer=""
+        ))
+        truncated_answer = sql_answer[:allowed_answer_len]
+        prompt = prompt_template.format(
+            conversation_history="",
+            user_query=user_query,
+            sql=sql,
+            answer=truncated_answer
+        )
 
     # Write the final prompt to a file for debugging
     prompt_path = os.path.join(os.path.dirname(__file__), "prompt.txt")

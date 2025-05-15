@@ -144,15 +144,44 @@ def get_sql_and_answer(nl_query):
     Given a natural language query, return (sql_query, sql_answer_str)
     """
     result = process_natural_language_query(nl_query)
-    if "sql" in result and "results" in result and result["results"]["success"]:
-        sql_query = result["sql"]
-        sql_answer = json.dumps(result["results"]["results"], indent=2)
+    # Print the raw LLM response for debugging
+    if 'full_response' in result:
+        print("[DEBUG] Raw LLM response:\n", result['full_response'])
+    elif 'sql' not in result and 'error' in result:
+        print("[DEBUG] SQL generation error:", result['error'])
+
+    sql_query = None
+    # Try to extract SQL robustly
+    if 'sql' in result:
+        sql_query = result['sql']
+    elif 'full_response' in result:
+        import re
+        # Try to extract from ```sql ... ```
+        match = re.search(r"```sql\s*(.*?)\s*```", result['full_response'], re.DOTALL | re.IGNORECASE)
+        if match:
+            sql_query = match.group(1).strip()
+            print("[DEBUG] Extracted SQL from code block:", sql_query)
+        else:
+            # Fallback: try to find first SELECT statement
+            match = re.search(r"(SELECT[\s\S]+?;)", result['full_response'], re.IGNORECASE)
+            if match:
+                sql_query = match.group(1).strip()
+                print("[DEBUG] Extracted SQL from SELECT fallback:", sql_query)
+            else:
+                print("[DEBUG] Could not extract SQL from LLM response.")
+                sql_query = ""
+    else:
+        sql_query = ""
+
+    # Format the answer as a string (customize as needed)
+    if 'results' in result and result['results']['success']:
+        sql_answer = json.dumps(result['results']['results'], indent=2)
         print("[DEBUG] Generated SQL Query:\n", sql_query)
         print("[DEBUG] SQL Answer/Response:\n", sql_answer)
         return sql_query, sql_answer
     else:
         print("[DEBUG] SQL generation or execution failed:", result.get('error', 'Unknown error'))
-        return "", f"Error: {result.get('error', 'Unknown error')}"
+        return sql_query or "", f"Error: {result.get('error', 'Unknown error')}"
 
 if __name__ == "__main__":
     # Check if database exists, if not suggest running excel_to_sqlite.py first

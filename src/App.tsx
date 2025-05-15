@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ParticleCloud from "./ParticleCloud";
+import RecordingBars from "./RecordingBars";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,7 +16,7 @@ interface Message {
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [status, setStatus] = useState<'listening' | 'speaking' | 'processing'>('listening');
+  const [status, setStatus] = useState<'waiting' | 'listening' | 'speaking' | 'processing'>('waiting');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -27,6 +28,7 @@ function App() {
   const streamRef = useRef<MediaStream | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const isRecordingRef = useRef(false);
+  const [barVolumes, setBarVolumes] = useState(Array(8).fill(0));
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -37,7 +39,8 @@ function App() {
   }, [messages]);
 
   useEffect(() => {
-    // Start listening on mount
+    // Start in waiting mode
+    setStatus('waiting');
     startListening();
     // Cleanup on unmount
     return () => {
@@ -81,7 +84,7 @@ function App() {
   let speechBufferCount = 0;
 
   const startListening = async () => {
-    setStatus('listening');
+    setStatus('waiting');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -98,10 +101,22 @@ function App() {
 
       processor.onaudioprocess = (event) => {
         const inputData = event.inputBuffer.getChannelData(0);
-        // Calculate RMS energy
+        // Calculate RMS energy for VAD
         const rms = Math.sqrt(inputData.reduce((sum, sample) => sum + sample * sample, 0) / inputData.length);
 
+        // Calculate 8 band volumes for animation
+        const bandSize = Math.floor(inputData.length / 8);
+        const bands = Array(8).fill(0).map((_, i) => {
+          const start = i * bandSize;
+          const end = (i === 7) ? inputData.length : (i + 1) * bandSize;
+          const band = inputData.slice(start, end);
+          const bandRms = Math.sqrt(band.reduce((sum, s) => sum + s * s, 0) / band.length);
+          return Math.min(1, bandRms * 10); // scale for visual effect
+        });
+        setBarVolumes(bands);
+
         if (rms > SPEECH_THRESHOLD) {
+          if (status !== 'listening') setStatus('listening');
           speechBufferCount += 1;
         } else {
           speechBufferCount = 0;
@@ -110,14 +125,8 @@ function App() {
         if (speechBufferCount >= MIN_SPEECH_BUFFERS && !isRecordingRef.current) {
           setIsRecording(true);
           isRecordingRef.current = true;
-          if (status === 'speaking' && audioPlayerRef.current?.paused === false) {
-            stopPlayback();
-            stopListening();
-            startRecording();
-          } else if (status === 'listening') {
-            stopListening();
-            startRecording();
-          }
+          stopListening();
+          startRecording();
           speechBufferCount = 0; // reset after triggering
         }
       };
@@ -128,7 +137,7 @@ function App() {
 
   const startRecording = () => {
     stopListening(); // ensure all previous VAD is cleaned up
-    setStatus('processing');
+    setStatus('listening');
     setIsRecording(true);
     isRecordingRef.current = true;
     audioChunksRef.current = [];
@@ -139,10 +148,12 @@ function App() {
         audioChunksRef.current.push(event.data);
       };
       mediaRecorder.onstop = async () => {
+        setStatus('processing');
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         await processAudio(audioBlob);
         setIsRecording(false); // unlock after recording
         isRecordingRef.current = false;
+        setStatus('waiting'); // After processing, go back to waiting
         startListening();
       };
       mediaRecorder.start();
@@ -206,16 +217,15 @@ function App() {
 
       // Set new source and play
       audioPlayerRef.current.src = url;
+      audioPlayerRef.current.play();
       audioPlayerRef.current.onended = () => {
-        setStatus('listening');
-        // VAD is already running, so no need to restart it
+        setStatus('waiting');
+        startListening();
       };
-      audioPlayerRef.current.play().catch((e) => {
-        // Handle play interruption errors gracefully
-        console.warn('Audio play interrupted:', e);
-      });
     }
   };
+
+  console.log("isRecording:", isRecording, "status:", status);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -254,11 +264,15 @@ function App() {
             ))}
             <div ref={messagesEndRef} />
           </div>
-          {loading && <ParticleCloud />}
+          {status === 'waiting' && <RecordingBars animate color="purple" key="waiting" />}
+          {status === 'listening' && <RecordingBars key="listening" volumes={barVolumes} color="purple" />}
+          {status === 'processing' && <RecordingBars animate color="green" key="processing" />}
+          {loading && status !== 'processing' && status !== 'listening' && status !== 'waiting' && <ParticleCloud />}
           <div className="text-center mt-4 text-gray-600">
+            {status === 'waiting' && 'Waiting for Input...'}
             {status === 'listening' && 'Listening...'}
-            {status === 'speaking' && 'Bot is speaking...'}
             {status === 'processing' && 'Processing your message...'}
+            {status === 'speaking' && 'Bot is speaking...'}
           </div>
           <audio ref={audioPlayerRef} className="hidden" />
         </div>

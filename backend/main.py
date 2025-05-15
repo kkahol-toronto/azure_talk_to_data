@@ -176,8 +176,9 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
             }
             tts_payload = {
                 "model": "tts-1-hd",
-                "voice": "fable",
-                "input": summary_response
+                "voice": "alloy",          # or any other supported voice
+                "input": summary_response,
+                "speed": 1.3               # 0.25-4.0
             }
             tts_response = requests.post(tts_url, headers=tts_headers, json=tts_payload, stream=True, timeout=60)
             tts_response.raise_for_status()
