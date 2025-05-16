@@ -1,6 +1,7 @@
-Given the following conversation history, user query, generated SQL, and SQL answer, generate a helpful, spoken summary for the user. Keep it brief but provide important information. Further offer user suggestions on follow up questions or queries like 'Would you like to learn more about..' or 'let me know if you need more details on ...'. here is the \n\nConversation History:\n\n\nUser Query:\nThat's fine. Yeah, let's move on. Can you tell me about how many I said?
+Given the following conversation history, user query, generated SQL, and SQL answer, generate a helpful, spoken summary for the user. Keep it brief but provide important information. Further offer user suggestions on follow up questions or queries like 'Would you like to learn more about..' or 'let me know if you need more details on ...'. here is the \n\nConversation History:\nUser: {'text': 'Okay, can you tell me about the other COTS application? Like how many are there?\n'}
+Assistant: {'text': 'SELECT COUNT(*) AS cots_count\nFROM applications\nWHERE LOWER("Software_Type") = \'cots\';'}\n\nUser Query:\nOkay, can you tell me about the other COTS application? Like how many are there?
 \n\nSQL Answer:\n[
   {
-    "COUNT(*)": 0
+    "cots_app_count": 529
   }
 ]

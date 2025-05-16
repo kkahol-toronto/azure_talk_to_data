@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from openai import AzureOpenAI
-from cosmodb_manager import get_last_n_pairs
+from cosmodb_manager import get_last_n_pairs, add_request_response
 import sys
 import importlib.util
 import re
@@ -37,6 +37,11 @@ DEFAULT_PROMPT = (
 
 MAX_PROMPT_TOKENS = 1_000_000
 
+# New SQL query prompt with conversation history
+SQL_QUERY_PROMPT = '''
+You are an AI assistant that translates natural-language questions into SQL queries. -- DATABASE INFORMATION -- - Table name: {table_name} - Schema: {schema} -- COLUMN DESCRIPTIONS -- {column_descriptions} -- CONVERSATION HISTORY (most-recent first) -- {conversation_history} -- CURRENT USER QUERY -- {nl_query} YOUR TASK: 1. Read the column descriptions to identify which columns map to the concepts in the current user query. 2. If the current query refers to, depends on, or drills down into any past result (e.g. "of those customers", "the previous list", "add their email"), interpret the reference using CONVERSATION HISTORY: • Re-use the same filters, GROUP BY, or CTEs from the relevant earlier SQL. • If needed, wrap the previous query as a CTE and build on top of it. • Otherwise, start a fresh query. 3. Produce a single, syntactically correct SQL statement that answers the current question. IMPORTANT: - Users speak in natural language; they will not know column names. Infer column names from context (e.g. "ISIT" → PDO, "COTS" → Software_Type). - Return only the SQL, inside a fenced code block: sql SELECT ... - Do not include explanations, comments, or any text outside the SQL block.
+'''
+
 def estimate_tokens(text):
     return len(text) // 4
 
@@ -46,6 +51,15 @@ client = AzureOpenAI(
     azure_endpoint=AZURE_OPENAI_ENDPOINT,
     api_key=AZURE_OPENAI_API_KEY,
 )
+
+# Helper to format conversation history
+def format_conversation_history(history_pairs):
+    # Most recent first
+    lines = []
+    for user, assistant in reversed(history_pairs[-10:]):
+        lines.append(f"User: {user['text']}")
+        lines.append(f"Assistant: {assistant['text']}")
+    return '\n'.join(lines)
 
 def get_summary_response(user_query, session_id):
     """
@@ -116,3 +130,141 @@ def get_summary_response(user_query, session_id):
     )
     summary = response.choices[0].message.content
     return summary 
+
+def get_sql_from_llm(prompt, deployment_name):
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that generates SQL for SQLITE."},
+            {"role": "user", "content": prompt}
+        ],
+        model=deployment_name,
+        temperature=1.0,
+        top_p=1.0
+    )
+    content = response.choices[0].message.content
+
+    content = re.sub(r"(?im)^\s*sql\s*\n?", "", content)
+    content = content.strip()
+
+    match = re.search(r"SQL_START\s*(.*?)\s*SQL_END", content, re.DOTALL | re.IGNORECASE)
+    if match:
+        print("[DEBUG] Extracted SQL from SQL_START ... SQL_END")
+        return match.group(1).strip()
+
+    match = re.search(r"<SQL>\s*(.*?)\s*</SQL>", content, re.DOTALL | re.IGNORECASE)
+    if match:
+        print("[DEBUG] Extracted SQL from <SQL> ... </SQL>")
+        return match.group(1).strip()
+
+    match = re.search(r"```sql\s*(.*?)\s*```", content, re.DOTALL | re.IGNORECASE)
+    if match:
+        print("[DEBUG] Extracted SQL from code block")
+        return match.group(1).strip()
+
+    match = re.search(r'(SELECT[\s\S]+?;)', content, re.IGNORECASE)
+    if match:
+        print("[DEBUG] Extracted SQL from SELECT fallback")
+        return match.group(1).strip()
+    match = re.search(r'(SELECT[\s\S]+)', content, re.IGNORECASE)
+    if match:
+        print("[DEBUG] Extracted SQL from SELECT fallback (no semicolon)")
+        return match.group(1).strip()
+
+    print("[DEBUG] No SQL extracted, returning raw content")
+    return content.strip()
+
+def conversational_sql_query(session_id, nl_query):
+    """
+    Conversational SQL query flow using history, matching verify_sql_generation.py logic.
+    Returns a structured result dict with status, error_type, message, sql, and answer fields.
+    """
+    print("[DEBUG] Conversational SQL query started")
+    from dotenv import load_dotenv
+    load_dotenv(override=True)
+    sql_query_prompt = os.getenv("SQL_QUERY_PROMPT", SQL_QUERY_PROMPT)
+    deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+
+    # Get table name, schema, and column descriptions from query_engine
+    table_name = query_engine.TABLE_NAME
+    # Escape curly braces in schema and column_descriptions
+    schema = ', '.join(query_engine.get_database_schema()).replace('{', '{{').replace('}', '}}')
+    column_descriptions = str(query_engine.load_column_descriptions()).replace('{', '{{').replace('}', '}}')
+    db_path = query_engine.DB_FILE
+
+    # Get conversation history
+    history_pairs = get_last_n_pairs(session_id, n=10)
+    conversation_history = format_conversation_history(history_pairs)
+
+    # Debug prints
+    print("[DEBUG] Loaded SQL_QUERY_PROMPT:\n", sql_query_prompt)
+    print("[DEBUG] Format keys:", {
+        "table_name": table_name,
+        "schema": schema,
+        "column_descriptions": column_descriptions,
+        "conversation_history": conversation_history,
+        "nl_query": nl_query
+    })
+
+    # Build prompt
+    prompt = sql_query_prompt.format(
+        table_name=table_name,
+        schema=schema,
+        column_descriptions=column_descriptions,
+        conversation_history=conversation_history,
+        nl_query=nl_query
+    )
+
+    # Call LLM to get SQL
+    sql = get_sql_from_llm(prompt, deployment_name)
+    print("[DEBUG] SQL to execute:", repr(sql))
+
+    # Check for empty or None SQL
+    if not sql or not sql.strip():
+        print("[DEBUG] Extracted SQL is empty or None.")
+        return {
+            "status": "error",
+            "error_type": "no_sql_extracted",
+            "message": "Error: No SQL query could be extracted from the LLM response.",
+            "sql": sql,
+            "answer": None
+        }
+
+    # Execute SQL and get result
+    import sqlite3
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        print("[DEBUG] SQL execution result:", rows)
+        conn.close()
+        if rows:
+            # Store Q&A pair in CosmosDB
+            add_request_response(
+                session_id,
+                {"text": nl_query},
+                {"text": sql}
+            )
+            return {
+                "status": "success",
+                "sql": sql,
+                "answer": rows
+            }
+        else:
+            print("[DEBUG] SQL executed but returned no results.")
+            return {
+                "status": "error",
+                "error_type": "no_results",
+                "message": "Error: SQL executed but returned no results.",
+                "sql": sql,
+                "answer": None
+            }
+    except Exception as e:
+        print("[DEBUG] SQL execution error:", e)
+        return {
+            "status": "error",
+            "error_type": "sql_execution",
+            "message": f"Error executing SQL: {e}",
+            "sql": sql,
+            "answer": None
+        } 

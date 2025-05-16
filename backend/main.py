@@ -25,7 +25,7 @@ import io
 import requests
 from datetime import datetime
 import shutil
-from data_processing import get_summary_response
+from data_processing import get_summary_response, conversational_sql_query
 from cosmodb_manager import add_request_response
 import uuid
 import subprocess
@@ -160,10 +160,16 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
             # Generate or use provided session_id
             if not session_id:
                 session_id = str(uuid.uuid4())
-            # Get summary response from data_processing
+            # Use conversational_sql_query to get SQL and result
+            result = conversational_sql_query(session_id, transcription)
+            sql = result.get("sql")
+            sql_result = result.get("answer")
+            sql_status = result.get("status")
+            sql_error_type = result.get("error_type")
+            sql_message = result.get("message")
+            # Get summary response from data_processing (optional, for TTS)
             summary_response = get_summary_response(transcription, session_id)
-            # Store request/response in CosmosDB
-            add_request_response(session_id, transcription, summary_response)
+            # Store request/response in CosmosDB (already done in conversational_sql_query)
             # TTS via AOAI TTS endpoint (use summary_response)
             tts_url = (
                 f"{os.getenv('AZURE_OPENAI_TTS_ENDPOINT').rstrip('/')}"
@@ -218,6 +224,11 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
             return {
                 "session_id": session_id,
                 "response": summary_response,
+                "sql": sql,
+                "sql_result": sql_result,
+                "sql_status": sql_status,
+                "sql_error_type": sql_error_type,
+                "sql_message": sql_message,
                 "audio": audio_data.hex(),
                 "transcription": transcription,
                 "files": {

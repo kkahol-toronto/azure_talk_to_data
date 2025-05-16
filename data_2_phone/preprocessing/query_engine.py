@@ -143,6 +143,7 @@ def get_sql_and_answer(nl_query):
     """
     Given a natural language query, return (sql_query, sql_answer_str)
     """
+    print("inside get_sql_and_answer")
     result = process_natural_language_query(nl_query)
     # Print the raw LLM response for debugging
     if 'full_response' in result:
@@ -172,16 +173,30 @@ def get_sql_and_answer(nl_query):
                 sql_query = ""
     else:
         sql_query = ""
+    
+    print("[DEBUG] SQL Query:\n", sql_query)
 
-    # Format the answer as a string (customize as needed)
-    if 'results' in result and result['results']['success']:
-        sql_answer = json.dumps(result['results']['results'], indent=2)
-        print("[DEBUG] Generated SQL Query:\n", sql_query)
-        print("[DEBUG] SQL Answer/Response:\n", sql_answer)
-        return sql_query, sql_answer
+    # 1. If SQL query is empty or not extracted
+    if not sql_query or not sql_query.strip():
+        print("[DEBUG] No SQL query extracted.")
+        return "", "Error: No SQL query could be extracted from the LLM response."
+
+    # 2. Execute SQL query
+    results = execute_query(sql_query)
+
+    # 3. If SQL executes but returns no results
+    if results and results.get('success'):
+        if results['results']:
+            sql_answer = json.dumps(results['results'], indent=2)
+            print("[DEBUG] Generated SQL Query:\n", sql_query)
+            print("[DEBUG] SQL Answer/Response:\n", sql_answer)
+            return sql_query, sql_answer
+        else:
+            print("[DEBUG] SQL executed but returned no results.")
+            return sql_query, "Error: SQL executed but returned no results."
     else:
-        print("[DEBUG] SQL generation or execution failed:", result.get('error', 'Unknown error'))
-        return sql_query or "", f"Error: {result.get('error', 'Unknown error')}"
+        print("[DEBUG] SQL generation or execution failed:", results.get('error', 'Unknown error') if results else 'No results')
+        return sql_query or "", f"Error: {results.get('error', 'Unknown error') if results else 'No results'}"
 
 if __name__ == "__main__":
     # Check if database exists, if not suggest running excel_to_sqlite.py first
