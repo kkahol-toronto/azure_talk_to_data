@@ -25,7 +25,7 @@ import io
 import requests
 from datetime import datetime
 import shutil
-from data_processing import get_summary_response, conversational_sql_query
+from data_processing import get_summary_response, conversational_sql_query, correct_transcription_terms
 from cosmodb_manager import add_request_response
 import uuid
 import subprocess
@@ -151,6 +151,8 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
                 )
             if response.status_code == 200:
                 transcription = response.text
+                # Apply post-processing correction for domain-specific terms
+                transcription = correct_transcription_terms(transcription)
                 transcription_path = save_to_temp(transcription, "transcription", "txt")
                 logger.info(f"Saved transcription to: {transcription_path}")
                 logger.info(f"Transcription successful: {transcription}")

@@ -39,7 +39,17 @@ MAX_PROMPT_TOKENS = 1_000_000
 
 # New SQL query prompt with conversation history
 SQL_QUERY_PROMPT = '''
-You are an AI assistant that translates natural-language questions into SQL queries. -- DATABASE INFORMATION -- - Table name: {table_name} - Schema: {schema} -- COLUMN DESCRIPTIONS -- {column_descriptions} -- CONVERSATION HISTORY (most-recent first) -- {conversation_history} -- CURRENT USER QUERY -- {nl_query} YOUR TASK: 1. Read the column descriptions to identify which columns map to the concepts in the current user query. 2. If the current query refers to, depends on, or drills down into any past result (e.g. "of those customers", "the previous list", "add their email"), interpret the reference using CONVERSATION HISTORY: • Re-use the same filters, GROUP BY, or CTEs from the relevant earlier SQL. • If needed, wrap the previous query as a CTE and build on top of it. • Otherwise, start a fresh query. 3. Produce a single, syntactically correct SQL statement that answers the current question. IMPORTANT: - Users speak in natural language; they will not know column names. Infer column names from context (e.g. "ISIT" → PDO, "COTS" → Software_Type). - Return only the SQL, inside a fenced code block: sql SELECT ... - Do not include explanations, comments, or any text outside the SQL block.
+You are an AI assistant that translates natural-language questions into SQL queries.
+-- DATABASE INFORMATION --
+- Table name: {table_name}
+- Schema: {schema}
+-- COLUMN DESCRIPTIONS (with example values) --
+{column_descriptions}
+-- CONVERSATION HISTORY (most-recent first) --
+{conversation_history}
+-- CURRENT USER QUERY --
+{nl_query}
+IMPORTANT: Use the exact column names and example values as shown above when generating SQL. If the user refers to a value that is similar to, but not exactly, an example value, map it to the closest valid value. Return only the SQL, inside a fenced code block: sql SELECT ... Do not include explanations, comments, or any text outside the SQL block.
 '''
 
 def estimate_tokens(text):
@@ -60,6 +70,39 @@ def format_conversation_history(history_pairs):
         lines.append(f"User: {user['text']}")
         lines.append(f"Assistant: {assistant['text']}")
     return '\n'.join(lines)
+
+def correct_transcription_terms(transcription: str) -> str:
+    """
+    Correct common mis-transcriptions for domain-specific terms and acronyms.
+    Extend this mapping as needed for your use case.
+    """
+    corrections = {
+        "iset": "isit",
+        "icit": "isit",
+        "i s i t": "isit",
+        "i set": "isit",
+        # Add more mappings as needed
+    }
+    for wrong, right in corrections.items():
+        # Replace case-insensitively
+        transcription = re.sub(rf"\\b{wrong}\\b", right, transcription, flags=re.IGNORECASE)
+    return transcription
+
+def correct_sql_terms(sql: str) -> str:
+    """
+    Correct common mis-transcriptions in SQL values (e.g., 'iset', 'icit' to 'isit').
+    Uses the same mapping as correct_transcription_terms.
+    """
+    corrections = {
+        "iset": "isit",
+        "icit": "isit",
+        "i s i t": "isit",
+        "i set": "isit",
+        # Add more mappings as needed
+    }
+    for wrong, right in corrections.items():
+        sql = re.sub(rf"'\s*{wrong}\s*'", f"'{right}'", sql, flags=re.IGNORECASE)
+    return sql
 
 def get_summary_response(user_query, session_id):
     """
@@ -144,9 +187,13 @@ def get_sql_from_llm(prompt, deployment_name):
     content = response.choices[0].message.content
 
     content = re.sub(r"(?im)^\s*sql\s*\n?", "", content)
+    # Normalize whitespace and line endings
+    content = content.replace('\xa0', ' ').replace('\r\n', '\n').replace('\r', '\n')
     content = content.strip()
+    print("[DEBUG] Content before SQL extraction:", repr(content))
 
-    match = re.search(r"SQL_START\s*(.*?)\s*SQL_END", content, re.DOTALL | re.IGNORECASE)
+    # Updated regex: allow for optional whitespace before SQL_START
+    match = re.search(r"\s*SQL_START\s*(.*?)\s*SQL_END", content, re.DOTALL | re.IGNORECASE)
     if match:
         print("[DEBUG] Extracted SQL from SQL_START ... SQL_END")
         return match.group(1).strip()
@@ -186,14 +233,25 @@ def conversational_sql_query(session_id, nl_query):
 
     # Get table name, schema, and column descriptions from query_engine
     table_name = query_engine.TABLE_NAME
-    # Escape curly braces in schema and column_descriptions
     schema = ', '.join(query_engine.get_database_schema()).replace('{', '{{').replace('}', '}}')
-    column_descriptions = str(query_engine.load_column_descriptions()).replace('{', '{{').replace('}', '}}')
+    # Load column descriptions and append example values for key columns
+    column_descriptions_dict = query_engine.load_column_descriptions()
+    # Example: Add example values for App_Acronym if not present
+    if isinstance(column_descriptions_dict, dict):
+        if 'App_Acronym' in column_descriptions_dict and 'Example values' not in column_descriptions_dict['App_Acronym']:
+            column_descriptions_dict['App_Acronym'] += ' Example values: ISIT, COTS, ...'
+        column_descriptions = '\n'.join(f"{k}: {v}" for k, v in column_descriptions_dict.items())
+    else:
+        column_descriptions = str(column_descriptions_dict)
+    column_descriptions = column_descriptions.replace('{', '{{').replace('}', '}}')
     db_path = query_engine.DB_FILE
 
     # Get conversation history
     history_pairs = get_last_n_pairs(session_id, n=10)
     conversation_history = format_conversation_history(history_pairs)
+
+    # Apply correction to the user query before LLM prompt
+    nl_query = correct_transcription_terms(nl_query)
 
     # Debug prints
     print("[DEBUG] Loaded SQL_QUERY_PROMPT:\n", sql_query_prompt)
@@ -216,7 +274,11 @@ def conversational_sql_query(session_id, nl_query):
 
     # Call LLM to get SQL
     sql = get_sql_from_llm(prompt, deployment_name)
-    print("[DEBUG] SQL to execute:", repr(sql))
+    print("[DEBUG] SQL to execute (pre-correction):", repr(sql))
+
+    # Post-process SQL to correct values
+    sql = correct_sql_terms(sql)
+    print("[DEBUG] SQL to execute (post-correction):", repr(sql))
 
     # Check for empty or None SQL
     if not sql or not sql.strip():

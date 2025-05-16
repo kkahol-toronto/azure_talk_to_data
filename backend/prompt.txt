@@ -1,7 +1,49 @@
-Given the following conversation history, user query, generated SQL, and SQL answer, generate a helpful, spoken summary for the user. Keep it brief but provide important information. Further offer user suggestions on follow up questions or queries like 'Would you like to learn more about..' or 'let me know if you need more details on ...'. here is the \n\nConversation History:\nUser: {'text': 'Okay, can you tell me about the other COTS application? Like how many are there?\n'}
-Assistant: {'text': 'SELECT COUNT(*) AS cots_count\nFROM applications\nWHERE LOWER("Software_Type") = \'cots\';'}\n\nUser Query:\nOkay, can you tell me about the other COTS application? Like how many are there?
+Given the following conversation history, user query, generated SQL, and SQL answer, generate a helpful, spoken summary for the user. Keep it brief but provide important information. Further offer user suggestions on follow up questions or queries like 'Would you like to learn more about..' or 'let me know if you need more details on ...'. here is the \n\nConversation History:\nUser: {'text': 'Can you give me the names of these eight apps?\n'}
+Assistant: {'text': 'SELECT "APP_NAME"\nFROM applications\nWHERE "App_ID" IN (53108, 50417, 18718, 13896, 21453, 13017, 17826, 11760);'}\n\nUser Query:\nCan you give me the names of these eight apps?
 \n\nSQL Answer:\n[
   {
-    "cots_app_count": 529
+    "APP_NAME": "Zebra Android Scanner"
+  },
+  {
+    "APP_NAME": "X-Functional Tire Estimator"
+  },
+  {
+    "APP_NAME": "XUI-Cross Network Messaging User Interface"
+  },
+  {
+    "APP_NAME": "XUI-Cross Network Messaging User Interface"
+  },
+  {
+    "APP_NAME": "XNET"
+  },
+  {
+    "APP_NAME": "XNET"
+  },
+  {
+    "APP_NAME": "X-Functional Tire Estimator"
+  },
+  {
+    "APP_NAME": "www.vehdyn.ford.com"
+  },
+  {
+    "APP_NAME": "X-Carline Chart"
+  },
+  {
+    "APP_NAME": "WOW"
+  },
+  {
+    "APP_NAME": "X-Carline Chart"
+  },
+  {
+    "APP_NAME": "Workforce One (WF1) - Kronos Workforce Central"
+  },
+  {
+    "APP_NAME": "Workforce One (WF1) - Kronos Workforce Central"
+  },
+  {
+    "APP_NAME": "Workforce One (WF1) - Kronos Workforce Central"
+  },
+  {
+    "APP_NAME": "X-Carline Chart"
   }
 ]

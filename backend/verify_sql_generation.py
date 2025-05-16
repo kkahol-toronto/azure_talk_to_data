@@ -25,14 +25,33 @@ def get_sql_from_llm(prompt, deployment_name):
         top_p=1.0
     )
     content = response.choices[0].message.content
-    # Try to extract SQL from code block
+    # Normalize whitespace and line endings
+    content = re.sub(r"(?im)^\s*sql\s*\n?", "", content)
+    content = content.replace('\xa0', ' ').replace('\r\n', '\n').replace('\r', '\n')
+    content = content.strip()
+    print("[DEBUG] Content before SQL extraction:", repr(content))
+    # Updated regex: allow for optional whitespace before SQL_START
+    match = re.search(r"\s*SQL_START\s*(.*?)\s*SQL_END", content, re.DOTALL | re.IGNORECASE)
+    if match:
+        print("[DEBUG] Extracted SQL from SQL_START ... SQL_END")
+        return match.group(1).strip()
+    match = re.search(r"<SQL>\s*(.*?)\s*</SQL>", content, re.DOTALL | re.IGNORECASE)
+    if match:
+        print("[DEBUG] Extracted SQL from <SQL> ... </SQL>")
+        return match.group(1).strip()
     match = re.search(r"```sql\s*(.*?)\s*```", content, re.DOTALL | re.IGNORECASE)
     if match:
+        print("[DEBUG] Extracted SQL from code block")
         return match.group(1).strip()
-    # Fallback: extract first SELECT statement
     match = re.search(r'(SELECT[\s\S]+?;)', content, re.IGNORECASE)
     if match:
+        print("[DEBUG] Extracted SQL from SELECT fallback")
         return match.group(1).strip()
+    match = re.search(r'(SELECT[\s\S]+)', content, re.IGNORECASE)
+    if match:
+        print("[DEBUG] Extracted SQL from SELECT fallback (no semicolon)")
+        return match.group(1).strip()
+    print("[DEBUG] No SQL extracted, returning raw content")
     return content.strip()
 
 def main():
@@ -82,7 +101,7 @@ def main():
 
         print("\n--- LLM SQL Output ---\n")
         sql = get_sql_from_llm(prompt, deployment_name)
-        print(sql)
+        print(f"[DEBUG] SQL Query (from get_sql_from_llm):\n{sql}")
         input("\nPress Enter to execute the SQL query...")
 
         # Optionally, execute SQL (example for SQLite)

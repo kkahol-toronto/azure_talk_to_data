@@ -140,62 +140,73 @@ def process_natural_language_query(nl_query):
         }
 
 def get_sql_and_answer(nl_query):
-    """
-    Given a natural language query, return (sql_query, sql_answer_str)
-    """
-    print("inside get_sql_and_answer")
+    print("[DEBUG] >>> ENTERED get_sql_and_answer (query_engine.py)")
     result = process_natural_language_query(nl_query)
-    # Print the raw LLM response for debugging
-    if 'full_response' in result:
-        print("[DEBUG] Raw LLM response:\n", result['full_response'])
-    elif 'sql' not in result and 'error' in result:
-        print("[DEBUG] SQL generation error:", result['error'])
-
     sql_query = None
-    # Try to extract SQL robustly
-    if 'sql' in result:
-        sql_query = result['sql']
-    elif 'full_response' in result:
+    def clean_sql(sql):
+        sql = sql.strip()
+        sql = re.sub(r'(_END|SQL_END)\s*$', '', sql, flags=re.IGNORECASE).strip()
+        return sql
+    if 'full_response' in result:
         import re
-        # Try to extract from ```sql ... ```
-        match = re.search(r"```sql\s*(.*?)\s*```", result['full_response'], re.DOTALL | re.IGNORECASE)
+        content = result['full_response']
+        content = re.sub(r"(?im)^\s*sql\s*\n?", "", content)
+        content = content.replace('\xa0', ' ').replace('\r\n', '\n').replace('\r', '\n')
+        content = content.strip()
+        print("[DEBUG] Content before SQL extraction (query_engine):", repr(content))
+        match = re.search(r"\s*SQL_START\s*(.*?)\s*SQL_END", content, re.DOTALL | re.IGNORECASE)
         if match:
-            sql_query = match.group(1).strip()
-            print("[DEBUG] Extracted SQL from code block:", sql_query)
+            sql_query = clean_sql(match.group(1))
+            print("[DEBUG] Extracted SQL from SQL_START ... SQL_END (query_engine):", sql_query)
         else:
-            # Fallback: try to find first SELECT statement
-            match = re.search(r"(SELECT[\s\S]+?;)", result['full_response'], re.IGNORECASE)
+            match = re.search(r"<SQL>\s*(.*?)\s*</SQL>", content, re.DOTALL | re.IGNORECASE)
             if match:
-                sql_query = match.group(1).strip()
-                print("[DEBUG] Extracted SQL from SELECT fallback:", sql_query)
+                sql_query = clean_sql(match.group(1))
+                print("[DEBUG] Extracted SQL from <SQL> ... </SQL> (query_engine):", sql_query)
             else:
-                print("[DEBUG] Could not extract SQL from LLM response.")
-                sql_query = ""
+                match = re.search(r"```sql\s*(.*?)\s*```", content, re.DOTALL | re.IGNORECASE)
+                if match:
+                    sql_query = clean_sql(match.group(1))
+                    print("[DEBUG] Extracted SQL from code block (query_engine):", sql_query)
+                else:
+                    match = re.search(r"(SELECT[\s\S]+?;)", content, re.IGNORECASE)
+                    if match:
+                        sql_query = clean_sql(match.group(1))
+                        print("[DEBUG] Extracted SQL from SELECT fallback (query_engine):", sql_query)
+                    else:
+                        match = re.search(r"(SELECT[\s\S]+)", content, re.IGNORECASE)
+                        if match:
+                            sql_query = clean_sql(match.group(1))
+                            print("[DEBUG] Extracted SQL from SELECT fallback (no semicolon, query_engine):", sql_query)
+                        else:
+                            print("[DEBUG] Could not extract SQL from LLM response. (query_engine)")
+                            sql_query = ""
+    elif 'sql' in result:
+        print("[DEBUG] Extraction path: 'sql' in result")
+        sql_query = clean_sql(result['sql'])
     else:
+        print("[DEBUG] Extraction path: no sql or full_response in result")
         sql_query = ""
-    
-    print("[DEBUG] SQL Query:\n", sql_query)
+    print("[DEBUG] SQL Query (from get_sql_and_answer):\n", sql_query)
 
-    # 1. If SQL query is empty or not extracted
     if not sql_query or not sql_query.strip():
-        print("[DEBUG] No SQL query extracted.")
+        print("[DEBUG] No SQL query extracted. Returning error from get_sql_and_answer.")
         return "", "Error: No SQL query could be extracted from the LLM response."
 
-    # 2. Execute SQL query
     results = execute_query(sql_query)
 
-    # 3. If SQL executes but returns no results
     if results and results.get('success'):
         if results['results']:
             sql_answer = json.dumps(results['results'], indent=2)
             print("[DEBUG] Generated SQL Query:\n", sql_query)
             print("[DEBUG] SQL Answer/Response:\n", sql_answer)
+            print("[DEBUG] Returning successful SQL and answer from get_sql_and_answer.")
             return sql_query, sql_answer
         else:
-            print("[DEBUG] SQL executed but returned no results.")
+            print("[DEBUG] SQL executed but returned no results. Returning from get_sql_and_answer.")
             return sql_query, "Error: SQL executed but returned no results."
     else:
-        print("[DEBUG] SQL generation or execution failed:", results.get('error', 'Unknown error') if results else 'No results')
+        print("[DEBUG] SQL generation or execution failed. Returning from get_sql_and_answer:", results.get('error', 'Unknown error') if results else 'No results')
         return sql_query or "", f"Error: {results.get('error', 'Unknown error') if results else 'No results'}"
 
 if __name__ == "__main__":
