@@ -68,7 +68,14 @@ def format_conversation_history(history_pairs):
     lines = []
     for user, assistant in reversed(history_pairs[-10:]):
         lines.append(f"User: {user['text']}")
-        lines.append(f"Assistant: {assistant['text']}")
+        # Handle new response structure: dict with 'sql' and 'spoken'
+        if isinstance(assistant['text'], dict):
+            if 'sql' in assistant['text']:
+                lines.append(f"Assistant (SQL): {assistant['text']['sql']}")
+            if 'spoken' in assistant['text']:
+                lines.append(f"Assistant (spoken): {assistant['text']['spoken']}")
+        else:
+            lines.append(f"Assistant: {assistant['text']}")
     return '\n'.join(lines)
 
 def correct_transcription_terms(transcription: str) -> str:
@@ -249,6 +256,9 @@ def conversational_sql_query(session_id, nl_query):
     # Get conversation history
     history_pairs = get_last_n_pairs(session_id, n=10)
     conversation_history = format_conversation_history(history_pairs)
+    #write the conversation history to a file
+    with open("conversation_history.txt", "w") as f:
+        f.write(conversation_history)
 
     # Apply correction to the user query before LLM prompt
     nl_query = correct_transcription_terms(nl_query)
@@ -283,6 +293,12 @@ def conversational_sql_query(session_id, nl_query):
     # Check for empty or None SQL
     if not sql or not sql.strip():
         print("[DEBUG] Extracted SQL is empty or None.")
+        # Store Q&A pair with empty SQL and no spoken summary
+        add_request_response(
+            session_id,
+            {"text": nl_query},
+            {"sql": sql, "spoken": None}
+        )
         return {
             "status": "error",
             "error_type": "no_sql_extracted",
@@ -300,13 +316,15 @@ def conversational_sql_query(session_id, nl_query):
         rows = cursor.fetchall()
         print("[DEBUG] SQL execution result:", rows)
         conn.close()
+        # Generate spoken summary (call get_summary_response)
+        summary_response = get_summary_response(nl_query, session_id)
+        # Store Q&A pair in CosmosDB (store both SQL and spoken summary)
+        add_request_response(
+            session_id,
+            {"text": nl_query},
+            {"sql": sql, "spoken": summary_response}
+        )
         if rows:
-            # Store Q&A pair in CosmosDB
-            add_request_response(
-                session_id,
-                {"text": nl_query},
-                {"text": sql}
-            )
             return {
                 "status": "success",
                 "sql": sql,
@@ -323,6 +341,12 @@ def conversational_sql_query(session_id, nl_query):
             }
     except Exception as e:
         print("[DEBUG] SQL execution error:", e)
+        # Store Q&A pair with SQL and error as spoken summary
+        add_request_response(
+            session_id,
+            {"text": nl_query},
+            {"sql": sql, "spoken": f"Error executing SQL: {e}"}
+        )
         return {
             "status": "error",
             "error_type": "sql_execution",
