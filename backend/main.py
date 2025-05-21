@@ -11,7 +11,7 @@ This module implements the FastAPI backend for the Conversational AI App. It pro
 Environment variables are loaded from a .env file. The backend is designed to work with a React frontend and uses CORS for security.
 """
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from openai import AzureOpenAI
 from dotenv import load_dotenv
@@ -110,20 +110,20 @@ def save_to_temp(content, prefix, extension):
     return filepath
 
 @app.post("/api/chat")
-async def chat(audio: UploadFile = File(...), session_id: str = None):
+async def chat(audio: UploadFile = File(...), session_id: str = Form(None)):
     """Accepts an audio file, transcribes it, generates a summary response, and returns TTS audio."""
     try:
-        logger.info("Received audio file for processing")
+       # logger.info("Received audio file for processing")
         # Read the uploaded audio file
         content = await audio.read()
         # Save original audio
         original_audio_path = save_to_temp(content, "original_audio", "wav")
-        logger.info(f"Saved original audio to: {original_audio_path}")
+        #logger.info(f"Saved original audio to: {original_audio_path}")
         # Save the upload exactly as-is
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
             tmp.write(content)
             temp_audio_path = tmp.name
-        logger.info(f"Saved audio file to: {temp_audio_path}")
+        #logger.info(f"Saved audio file to: {temp_audio_path}")
         try:
             # Transcribe audio using Azure OpenAI Whisper
             whisper_url = (
@@ -154,8 +154,6 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
                 # Apply post-processing correction for domain-specific terms
                 transcription = correct_transcription_terms(transcription)
                 transcription_path = save_to_temp(transcription, "transcription", "txt")
-                logger.info(f"Saved transcription to: {transcription_path}")
-                logger.info(f"Transcription successful: {transcription}")
             else:
                 logger.error(f"Transcription failed with status {response.status_code}: {response.text}")
                 raise Exception(f"Transcription failed: {response.text}")

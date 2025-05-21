@@ -87,12 +87,20 @@ def main():
         print(conversation_history if conversation_history else "(No history yet)")
         input("\nPress Enter to see the generated prompt...")
 
+        # Ensure last_user_query and last_assistant_answer are always defined
+        if 'last_user_query' not in locals():
+            last_user_query = ''
+        if 'last_assistant_answer' not in locals():
+            last_assistant_answer = ''
+
         # Build prompt
         prompt = sql_query_prompt.format(
             table_name=table_name,
             schema=schema,
             column_descriptions=column_descriptions,
             conversation_history=conversation_history,
+            last_user_query=last_user_query,
+            last_assistant_answer=last_assistant_answer,
             nl_query=nl_query
         )
         print("\n--- Generated Prompt ---\n")

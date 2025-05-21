@@ -26,6 +26,19 @@ interface Message {
   };
 }
 
+// SessionID management
+function getOrCreateSessionID() {
+  let sessionID = localStorage.getItem('sessionID');
+  if (!sessionID) {
+    sessionID = crypto.randomUUID();
+    localStorage.setItem('sessionID', sessionID);
+    console.log('[SESSION] Generated new sessionID:', sessionID);
+  } else {
+    console.log('[SESSION] Loaded existing sessionID:', sessionID);
+  }
+  return sessionID;
+}
+
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [status, setStatus] = useState<'waiting' | 'listening' | 'speaking' | 'processing'>('waiting');
@@ -47,6 +60,7 @@ function App() {
   const [barVolumes, setBarVolumes] = useState(Array(8).fill(0));
   const isTTSStoppedRef = useRef(false);
   const [audioKey, setAudioKey] = useState(0);
+  const sessionID = getOrCreateSessionID();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -257,6 +271,8 @@ function App() {
     try {
       const formData = new FormData();
       formData.append('audio', audioBlob);
+      formData.append('session_id', sessionID); // Always include sessionID
+      console.log('[SESSION] Sending sessionID with API call:', sessionID);
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
         body: formData,

@@ -112,6 +112,8 @@ def correct_sql_terms(sql: str) -> str:
     return sql
 
 def get_summary_response(user_query, session_id):
+    last_user_query = ''
+    last_assistant_answer = ''
     """
     1. Use query_engine to get SQL and SQL answer for the user query.
     2. Retrieve last 10 Q&A pairs from CosmosDB.
@@ -124,6 +126,9 @@ def get_summary_response(user_query, session_id):
 
     # Step 2: Get last 10 Q&A pairs
     history_pairs = get_last_n_pairs(session_id, n=10)
+    if history_pairs:
+        last_user_query = history_pairs[-1][0]['text']['text']
+        last_assistant_answer = history_pairs[-1][1]['text'].get('spoken', '')
     history_str = "\n".join([
         f"User: {q['text']}\nAssistant: {a['text']}" for q, a in history_pairs
     ])
@@ -136,7 +141,9 @@ def get_summary_response(user_query, session_id):
         conversation_history=history_str,
         user_query=user_query,
         sql=sql,
-        answer=sql_answer
+        answer=sql_answer,
+        last_user_query=last_user_query,
+        last_assistant_answer=last_assistant_answer
     )
 
     if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
@@ -145,7 +152,9 @@ def get_summary_response(user_query, session_id):
             conversation_history="",
             user_query=user_query,
             sql=sql,
-            answer=sql_answer
+            answer=sql_answer,
+            last_user_query=last_user_query,
+            last_assistant_answer=last_assistant_answer
         )
     if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
         # Truncate SQL answer if still too long
@@ -153,14 +162,18 @@ def get_summary_response(user_query, session_id):
             conversation_history="",
             user_query=user_query,
             sql=sql,
-            answer=""
+            answer="",
+            last_user_query=last_user_query,
+            last_assistant_answer=last_assistant_answer
         ))
         truncated_answer = sql_answer[:allowed_answer_len]
         prompt = prompt_template.format(
             conversation_history="",
             user_query=user_query,
             sql=sql,
-            answer=truncated_answer
+            answer=truncated_answer,
+            last_user_query=last_user_query,
+            last_assistant_answer=last_assistant_answer
         )
 
     # Write the final prompt to a file for debugging
@@ -228,10 +241,9 @@ def get_sql_from_llm(prompt, deployment_name):
     return content.strip()
 
 def conversational_sql_query(session_id, nl_query):
-    """
-    Conversational SQL query flow using history, matching verify_sql_generation.py logic.
-    Returns a structured result dict with status, error_type, message, sql, and answer fields.
-    """
+    last_user_query = ''
+    last_assistant_answer = ''
+    print(f"[DEBUG] conversational_sql_query called with session_id: {session_id}")
     print("[DEBUG] Conversational SQL query started")
     from dotenv import load_dotenv
     load_dotenv(override=True)
@@ -243,7 +255,6 @@ def conversational_sql_query(session_id, nl_query):
     schema = ', '.join(query_engine.get_database_schema()).replace('{', '{{').replace('}', '}}')
     # Load column descriptions and append example values for key columns
     column_descriptions_dict = query_engine.load_column_descriptions()
-    # Example: Add example values for App_Acronym if not present
     if isinstance(column_descriptions_dict, dict):
         if 'App_Acronym' in column_descriptions_dict and 'Example values' not in column_descriptions_dict['App_Acronym']:
             column_descriptions_dict['App_Acronym'] += ' Example values: ISIT, COTS, ...'
@@ -254,8 +265,14 @@ def conversational_sql_query(session_id, nl_query):
     db_path = query_engine.DB_FILE
 
     # Get conversation history
+    print(f"[DEBUG] Calling get_last_n_pairs with session_id: {session_id}")
     history_pairs = get_last_n_pairs(session_id, n=10)
+    print(f"[DEBUG] Fetching history for session_id: {session_id}")
+    print(f"[DEBUG] Raw history pairs: {history_pairs}")
     conversation_history = format_conversation_history(history_pairs)
+    if history_pairs:
+        last_user_query = history_pairs[-1][0]['text']['text']
+        last_assistant_answer = history_pairs[-1][1]['text'].get('spoken', '')
     #write the conversation history to a file
     with open("conversation_history.txt", "w") as f:
         f.write(conversation_history)
@@ -264,14 +281,13 @@ def conversational_sql_query(session_id, nl_query):
     nl_query = correct_transcription_terms(nl_query)
 
     # Debug prints
-    print("[DEBUG] Loaded SQL_QUERY_PROMPT:\n", sql_query_prompt)
-    print("[DEBUG] Format keys:", {
-        "table_name": table_name,
-        "schema": schema,
-        "column_descriptions": column_descriptions,
-        "conversation_history": conversation_history,
-        "nl_query": nl_query
-    })
+    # print("[DEBUG] Format keys:", {
+    #     "table_name": table_name,
+    #     "schema": schema,
+    #     "column_descriptions": column_descriptions,
+    #     "conversation_history": conversation_history,
+    #     "nl_query": nl_query
+    # })
 
     # Build prompt
     prompt = sql_query_prompt.format(
@@ -279,8 +295,32 @@ def conversational_sql_query(session_id, nl_query):
         schema=schema,
         column_descriptions=column_descriptions,
         conversation_history=conversation_history,
+        last_user_query=last_user_query,
+        last_assistant_answer=last_assistant_answer,
         nl_query=nl_query
     )
+    if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
+        # Remove conversation history
+        prompt = sql_query_prompt.format(
+            table_name=table_name,
+            schema=schema,
+            column_descriptions=column_descriptions,
+            conversation_history="",
+            last_user_query=last_user_query,
+            last_assistant_answer=last_assistant_answer,
+            nl_query=nl_query
+        )
+    if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
+        # Truncate SQL answer if still too long (if needed)
+        prompt = sql_query_prompt.format(
+            table_name=table_name,
+            schema=schema,
+            column_descriptions=column_descriptions,
+            conversation_history="",
+            last_user_query=last_user_query,
+            last_assistant_answer=last_assistant_answer,
+            nl_query=nl_query
+        )
 
     # Call LLM to get SQL
     sql = get_sql_from_llm(prompt, deployment_name)
@@ -294,6 +334,7 @@ def conversational_sql_query(session_id, nl_query):
     if not sql or not sql.strip():
         print("[DEBUG] Extracted SQL is empty or None.")
         # Store Q&A pair with empty SQL and no spoken summary
+        print(f"[DEBUG] Calling add_request_response with session_id: {session_id}")
         add_request_response(
             session_id,
             {"text": nl_query},
@@ -319,6 +360,7 @@ def conversational_sql_query(session_id, nl_query):
         # Generate spoken summary (call get_summary_response)
         summary_response = get_summary_response(nl_query, session_id)
         # Store Q&A pair in CosmosDB (store both SQL and spoken summary)
+        print(f"[DEBUG] Calling add_request_response with session_id: {session_id}")
         add_request_response(
             session_id,
             {"text": nl_query},
@@ -342,6 +384,7 @@ def conversational_sql_query(session_id, nl_query):
     except Exception as e:
         print("[DEBUG] SQL execution error:", e)
         # Store Q&A pair with SQL and error as spoken summary
+        print(f"[DEBUG] Calling add_request_response with session_id: {session_id}")
         add_request_response(
             session_id,
             {"text": nl_query},

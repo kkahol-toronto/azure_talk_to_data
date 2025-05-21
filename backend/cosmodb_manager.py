@@ -18,6 +18,7 @@ container = database.create_container_if_not_exists(
 
 def add_request_response(session_id, request_text, response_text, request_time=None, response_time=None):
     """Add a request/response pair to the session in CosmosDB."""
+    print(f"[DEBUG] add_request_response called with session_id={session_id}, request_text={request_text}, response_text={response_text}")
     request_time = request_time or datetime.utcnow().strftime("%H:%M:%S UTC")
     response_time = response_time or datetime.utcnow().strftime("%H:%M:%S UTC")
     # Try to fetch the session doc
@@ -31,7 +32,11 @@ def add_request_response(session_id, request_text, response_text, request_time=N
         }
     session["request"].append({"text": request_text, "time": request_time})
     session["response"].append({"text": response_text, "time": response_time})
-    container.upsert_item(session)
+    try:
+        container.upsert_item(session)
+        print(f"[DEBUG] Successfully upserted session: {session_id}")
+    except Exception as e:
+        print(f"[ERROR] Failed to upsert session in CosmosDB: {e}")
 
 
 def get_last_n_pairs(session_id, n=10):

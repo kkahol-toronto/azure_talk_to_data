@@ -110,12 +110,20 @@ def process_natural_language_query(nl_query):
     # Get environmental variable containing the prompt template
     sql_query_prompt = os.getenv("SQL_QUERY_PROMPT")
     
+    # Ensure last_user_query and last_assistant_answer are always defined
+    if 'last_user_query' not in locals():
+        last_user_query = ''
+    if 'last_assistant_answer' not in locals():
+        last_assistant_answer = ''
+    
     # Fill the prompt template with our data
     prompt = sql_query_prompt.format(
         nl_query=nl_query,
         table_name=TABLE_NAME,
         schema=", ".join(schema_info),
-        column_descriptions=json.dumps(column_descriptions, indent=2)
+        column_descriptions=json.dumps(column_descriptions, indent=2),
+        last_user_query=last_user_query,
+        last_assistant_answer=last_assistant_answer
     )
     
     # Call the LLM

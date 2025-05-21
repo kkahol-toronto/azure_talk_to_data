@@ -1,0 +1,18 @@
+User: {'text': 'Can you tell me its app ID?\n'}
+Assistant (SQL): SELECT "App_ID"
+FROM applications
+WHERE LOWER("APP_NAME") = LOWER('Zebra Android Scanner')
+LIMIT 1;
+Assistant (spoken): It looks like there was an issue retrieving the app ID for the Zebra Android Scanner app due to a technical error with the database query. Would you like me to try again to find the app ID, or perhaps provide details about the app's features or usage? Let me know if you need more information or have other questions about the Zebra Android Scanner app.
+User: {'text': 'can you tell me about the Zebra Android Scanner app?\n'}
+Assistant (SQL): SELECT *
+FROM applications
+WHERE LOWER("APP_NAME") LIKE LOWER('%Zebra Android Scanner%')
+_END
+Assistant (spoken): Error executing SQL: near "_END": syntax error
+User: {'text': 'Can you tell me about the Zebra Android Scanner app?\n'}
+Assistant (SQL): SELECT * 
+FROM applications
+WHERE LOWER("APP_NAME") LIKE '%zebra android scanner%'
+LIMIT 25;
+Assistant (spoken): Error executing SQL: name 'last_user_query' is not defined
