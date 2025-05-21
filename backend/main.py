@@ -11,7 +11,7 @@ This module implements the FastAPI backend for the Conversational AI App. It pro
 Environment variables are loaded from a .env file. The backend is designed to work with a React frontend and uses CORS for security.
 """
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from openai import AzureOpenAI
 from dotenv import load_dotenv
@@ -25,10 +25,12 @@ import io
 import requests
 from datetime import datetime
 import shutil
-from data_processing import get_summary_response, conversational_sql_query, correct_transcription_terms
-from cosmodb_manager import add_request_response
+from data_processing import get_summary_response, conversational_sql_query, correct_transcription_terms, extract_app_name, get_subject, save_subject, get_last_n_pairs, resolve_pronouns
+from cosmodb_manager import add_pair, get_last_n_pairs, save_subject, get_subject
 import uuid
 import subprocess
+from app_lookup import lookup_property
+import re
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -109,9 +111,30 @@ def save_to_temp(content, prefix, extension):
     
     return filepath
 
+PROPERTY_KEYWORDS = ['app id', 'lifecycle state', 'life cycle state', 'status', 'id']
+def is_property_phrase(text):
+    return any(kw in text.lower() for kw in PROPERTY_KEYWORDS)
+
+def get_last_valid_subject(history_pairs):
+    for user, assistant in reversed(history_pairs):
+        for msg in [user, assistant]:
+            # Always extract string content
+            if isinstance(msg, dict) and 'content' in msg:
+                candidate_text = msg['content']
+            elif isinstance(msg, str):
+                candidate_text = msg
+            else:
+                continue
+            if not isinstance(candidate_text, str):
+                continue
+            candidate = extract_app_name(candidate_text)
+            if candidate and not is_property_phrase(candidate) and candidate.lower() not in ['its', 'it', 'their', 'the', 'that', 'this']:
+                return candidate
+    return None
+
 @app.post("/api/chat")
-async def chat(audio: UploadFile = File(...), session_id: str = None):
-    """Accepts an audio file, transcribes it, generates a summary response, and returns TTS audio."""
+async def chat(audio: UploadFile = File(...), session_id: str = Form(None)):
+    logger.info(f"[DEBUG] Received /api/chat request with session_id: {session_id}")
     try:
         logger.info("Received audio file for processing")
         # Read the uploaded audio file
@@ -162,16 +185,44 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
             # Generate or use provided session_id
             if not session_id:
                 session_id = str(uuid.uuid4())
-            # Use conversational_sql_query to get SQL and result
+            # Use pronoun-resolved transcription for SQL and summary
             result = conversational_sql_query(session_id, transcription)
             sql = result.get("sql")
             sql_result = result.get("answer")
             sql_status = result.get("status")
             sql_error_type = result.get("error_type")
             sql_message = result.get("message")
-            # Get summary response from data_processing (optional, for TTS)
             summary_response = get_summary_response(transcription, session_id)
-            # Store request/response in CosmosDB (already done in conversational_sql_query)
+            # 2. Try to extract a new subject from the resolved transcription
+            subject = None
+            extracted = extract_app_name(transcription)
+            # Only update subject if extracted is a valid app name and does NOT contain property keywords
+            if (
+                extracted
+                and not is_property_phrase(extracted)
+                and extracted.lower() not in ['its', 'it', 'their', 'the', 'that', 'this']
+                and not is_property_phrase(transcription)
+            ):
+                logger.info(f"[DEBUG] Extracted new subject from resolved transcription: {extracted}")
+                subject = extracted
+                save_subject(session_id, subject)
+            else:
+                # Fallback: scan history for last valid app name (not a property phrase)
+                subject = get_last_valid_subject(get_last_n_pairs(session_id, n=10))
+                logger.info(f"[DEBUG] Fallback to last valid subject from history: {subject}")
+            logger.info(f"[DEBUG] FINAL subject for this turn: {subject}")
+            # --- PROPERTY LOOKUP LOGIC ---
+            property_match = re.search(r"\b(app id|lifecycle state)\b", transcription, re.IGNORECASE)
+            if property_match and subject:
+                column = property_match.group(1).title()
+                column = "App ID" if column.lower() == "app id" else "Lifecycle State"
+                try:
+                    value = lookup_property(subject, column)
+                    summary_response = f"The {subject}'s {column} is {value}."
+                    logger.info(f"[DEBUG] Successfully looked up {column} for {subject}: {value}")
+                except KeyError as e:
+                    summary_response = f"Sorry, I can't find the {column} for '{subject}'."
+                    logger.error(f"[DEBUG] Property lookup failed: {e}")
             # TTS via AOAI TTS endpoint (use summary_response)
             tts_url = (
                 f"{os.getenv('AZURE_OPENAI_TTS_ENDPOINT').rstrip('/')}"
@@ -223,6 +274,7 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
             # Clean up temporary files
             os.unlink(temp_audio_path)
             logger.info("Cleaned up temporary files")
+
             return {
                 "session_id": session_id,
                 "response": summary_response,

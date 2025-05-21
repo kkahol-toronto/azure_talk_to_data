@@ -1,10 +1,14 @@
 import os
 from dotenv import load_dotenv
 from openai import AzureOpenAI
-from cosmodb_manager import get_last_n_pairs, add_request_response
+from cosmodb_manager import get_last_n_pairs, add_pair, save_subject, get_subject
 import sys
 import importlib.util
 import re
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -26,14 +30,7 @@ AZURE_OPENAI_DEPLOYMENT_NAME = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
 API_VERSION = "2025-03-01-preview"
 
 # Prompt template for summary
-DEFAULT_PROMPT = (
-    "Given the following conversation history, user query, generated SQL, and SQL answer, "
-    "generate a helpful, spoken summary for the user.\n\n"
-    "Conversation History:\n{{conversation_history}}\n\n"
-    "User Query:\n{{user_query}}\n\n"
-    "Generated SQL:\n{{sql}}\n\n"
-    "SQL Answer:\n{{answer}}"
-)
+DEFAULT_PROMPT = ("Given the following conversation history, user query, generated SQL, and SQL answer, generate a helpful, spoken summary for the user. Use the conversation history to maintain context. When the user asks for an app property (like App ID), always try to match the app name as exactly as possible, using the best match if there is ambiguity, and do NOT return all results unless the user explicitly asks for a list. Use the exact column names and example values as shown above when generating SQL. Return only the SQL, inside a fenced code block: sql SELECT ... Do not include explanations, comments, or any text outside the SQL block. Conversation History: {conversation_history} User Query: {user_query} Generated SQL: {sql} SQL Answer: {answer}")
 
 MAX_PROMPT_TOKENS = 1_000_000
 
@@ -62,14 +59,59 @@ client = AzureOpenAI(
     api_key=AZURE_OPENAI_API_KEY,
 )
 
-# Helper to format conversation history
-def format_conversation_history(history_pairs):
-    # Most recent first
-    lines = []
-    for user, assistant in reversed(history_pairs[-10:]):
-        lines.append(f"User: {user['text']}")
-        lines.append(f"Assistant: {assistant['text']}")
-    return '\n'.join(lines)
+def extract_app_name(text):
+    """Extract app name from text using regex/fuzzy logic."""
+    if not text:
+        return None
+    # Example: match 'What is Zebra Android Scanner App?' or 'Tell me about X app'
+    patterns = [
+        r"(?:what is|tell me about|about|for|on|regarding)\s+(?:the\s+)?([A-Z][A-Za-z0-9 _\-]+?)(?:\s+app|\s+application|\?|\.|,|$)",
+        r"([A-Z][A-Za-z0-9 _\-]+?)(?:\s+app|\s+application|\?|\.|,|$)",
+        r"([A-Z][A-Za-z0-9 _\-]+?)(?:\?|\.|,|$)"
+    ]
+    for pattern in patterns:
+        m = re.search(pattern, text, re.IGNORECASE)
+        if m:
+            raw_name = m.group(1).strip()
+            if raw_name.lower() in ['its', 'it', 'their', 'the', 'that', 'this']:
+                continue
+            return raw_name
+    return None
+
+def resolve_pronouns(question: str, subject: str) -> str:
+    """Replace pronouns ('its', 'it's', 'it', 'their', 'the app', 'that app') with the saved subject, including 'it' with punctuation."""
+    if not subject:
+        return question
+    q = question
+    # Replace all pronoun forms with the subject
+    q = re.sub(r"\bit['']s\b", subject, q, flags=re.IGNORECASE)
+    q = re.sub(r"\bits['']?s\b", subject, q, flags=re.IGNORECASE)
+    q = re.sub(r"\bit\b", subject, q, flags=re.IGNORECASE)
+    q = re.sub(r"\bit([?.!,])", rf"{subject}\\1", q, flags=re.IGNORECASE)
+    q = re.sub(r"\btheir\b", subject, q, flags=re.IGNORECASE)
+    q = re.sub(r"\bthe app\b", subject, q, flags=re.IGNORECASE)
+    q = re.sub(r"\bthat app\b", subject, q, flags=re.IGNORECASE)
+    return q
+
+def preprocess_user_query(user_query, last_app_name):
+    """Replace pronouns like 'its', 'it', 'the app', 'that app' with the last app name if present."""
+    if last_app_name:
+        user_query = re.sub(r"\bits['']s\b", last_app_name, user_query, flags=re.IGNORECASE)
+        user_query = re.sub(r"\bits\b", last_app_name, user_query, flags=re.IGNORECASE)
+        user_query = re.sub(r"\bit\b", last_app_name, user_query, flags=re.IGNORECASE)
+        user_query = re.sub(r"\bthe app\b", last_app_name, user_query, flags=re.IGNORECASE)
+        user_query = re.sub(r"\bthat app\b", last_app_name, user_query, flags=re.IGNORECASE)
+    logger.info(f"[DEBUG] Preprocessed user query for LLM: {user_query}")
+    return user_query
+
+def format_conversation_history(history_pairs, n=10):
+    """Format only the last n conversation pairs as a list of {role, content} for OpenAI."""
+    trimmed_pairs = history_pairs[-n:] if len(history_pairs) > n else history_pairs
+    msgs = []
+    for user, assistant in trimmed_pairs:
+        msgs.append({"role": "user", "content": user["content"]})
+        msgs.append({"role": "assistant", "content": assistant["content"]})
+    return msgs
 
 def correct_transcription_terms(transcription: str) -> str:
     """
@@ -118,8 +160,13 @@ def get_summary_response(user_query, session_id):
     # Step 2: Get last 10 Q&A pairs
     history_pairs = get_last_n_pairs(session_id, n=10)
     history_str = "\n".join([
-        f"User: {q['text']}\nAssistant: {a['text']}" for q, a in history_pairs
+        f"User: {q['content']}\nAssistant: {a['content']}" for q, a in history_pairs
     ])
+
+    # Fallback: if user_query is blank, use the last user query from history
+    if not user_query or not user_query.strip():
+        if history_pairs and history_pairs[-1][0].get('content'):
+            user_query = history_pairs[-1][0]['content']
 
     # Step 3: Always reload .env and fetch prompt template
     load_dotenv(override=True)
@@ -302,7 +349,7 @@ def conversational_sql_query(session_id, nl_query):
         conn.close()
         if rows:
             # Store Q&A pair in CosmosDB
-            add_request_response(
+            add_pair(
                 session_id,
                 {"text": nl_query},
                 {"text": sql}

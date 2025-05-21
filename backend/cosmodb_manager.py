@@ -16,37 +16,59 @@ container = database.create_container_if_not_exists(
     partition_key=PartitionKey(path="/sessionID")
 )
 
-def add_request_response(session_id, request_text, response_text, request_time=None, response_time=None):
-    """Add a request/response pair to the session in CosmosDB."""
-    request_time = request_time or datetime.utcnow().strftime("%H:%M:%S UTC")
-    response_time = response_time or datetime.utcnow().strftime("%H:%M:%S UTC")
-    # Try to fetch the session doc
+def add_pair(session_id, user_msg, assistant_msg):
+    """Add a (user, assistant) pair to the session in CosmosDB as a list of {role, content}."""
     session = get_session(session_id)
     if session is None:
         session = {
             "id": session_id,
             "sessionID": session_id,
-            "request": [],
-            "response": []
+            "history": []
         }
-    session["request"].append({"text": request_text, "time": request_time})
-    session["response"].append({"text": response_text, "time": response_time})
+    # Only store user Q and assistant A
+    session.setdefault("history", []).append({"role": "user", "content": user_msg})
+    session["history"].append({"role": "assistant", "content": assistant_msg})
+    # Trim to last 10 pairs (20 messages)
+    session["history"] = session["history"][-20:]
     container.upsert_item(session)
 
-
 def get_last_n_pairs(session_id, n=10):
-    """Get the last n request/response pairs for a session."""
+    """Get the last n (user, assistant) pairs for a session as a list of (user_msg, assistant_msg) tuples."""
     session = get_session(session_id)
     if session is None:
         return []
-    reqs = session.get("request", [])[-n:]
-    resps = session.get("response", [])[-n:]
-    return list(zip(reqs, resps))
-
+    history = session.get("history", [])
+    # Only return complete pairs
+    pairs = []
+    i = 0
+    while i < len(history) - 1:
+        if history[i]["role"] == "user" and history[i+1]["role"] == "assistant":
+            pairs.append((history[i], history[i+1]))
+            i += 2
+        else:
+            i += 1
+    return pairs[-n:]
 
 def get_session(session_id):
     """Fetch the session document by sessionID."""
     query = f"SELECT * FROM c WHERE c.sessionID = @sessionID"
     params = [{"name": "@sessionID", "value": session_id}]
     items = list(container.query_items(query=query, parameters=params, enable_cross_partition_query=True))
-    return items[0] if items else None 
+    return items[0] if items else None
+
+def save_subject(session_id: str, subject: str):
+    """Store the primary entity name for this session."""
+    container.upsert_item({
+        "id": f"subject_{session_id}",
+        "sessionID": session_id,
+        "type": "subject",
+        "value": subject
+    })
+
+def get_subject(session_id: str):
+    """Retrieve the primary entity name for this session."""
+    try:
+        item = container.read_item(item=f"subject_{session_id}", partition_key=session_id)
+        return item.get("value")
+    except Exception:
+        return None 

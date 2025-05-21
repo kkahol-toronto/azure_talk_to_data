@@ -1,49 +1,2667 @@
-Given the following conversation history, user query, generated SQL, and SQL answer, generate a helpful, spoken summary for the user. Keep it brief but provide important information. Further offer user suggestions on follow up questions or queries like 'Would you like to learn more about..' or 'let me know if you need more details on ...'. here is the \n\nConversation History:\nUser: {'text': 'Can you give me the names of these eight apps?\n'}
-Assistant: {'text': 'SELECT "APP_NAME"\nFROM applications\nWHERE "App_ID" IN (53108, 50417, 18718, 13896, 21453, 13017, 17826, 11760);'}\n\nUser Query:\nCan you give me the names of these eight apps?
+Given the following conversation history, user query, generated SQL, and SQL answer, generate a helpful, spoken summary for the user. Keep it brief but provide important information. Further offer user suggestions on follow up questions or queries like 'Would you like to learn more about..' or 'let me know if you need more details on ...'. here is the \n\nConversation History:\n\n\nUser Query:\n. 
 \n\nSQL Answer:\n[
   {
-    "APP_NAME": "Zebra Android Scanner"
+    "APP_NAME": "1099 Misc Tax System",
+    "App_Acronym": "1099-MTS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "X-Functional Tire Estimator"
+    "APP_NAME": "1099 Misc Tax System",
+    "App_Acronym": "1099-MTS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
   },
   {
-    "APP_NAME": "XUI-Cross Network Messaging User Interface"
+    "APP_NAME": "ACCOUNT MANAGER - NORTH AMERICA",
+    "App_Acronym": "AM - NA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "XUI-Cross Network Messaging User Interface"
+    "APP_NAME": "AFRL - Registration & Licensing (UK)",
+    "App_Acronym": "AFRL",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "XNET"
+    "APP_NAME": "AFRL - Registration & Licensing (UK)",
+    "App_Acronym": "AFRL",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
   },
   {
-    "APP_NAME": "XNET"
+    "APP_NAME": "AGU Info",
+    "App_Acronym": "EuHR-AGU",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "X-Functional Tire Estimator"
+    "APP_NAME": "API FOCUS Cost Accounting",
+    "App_Acronym": "APICOST",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "www.vehdyn.ford.com"
+    "APP_NAME": "API FOCUS Menu (APIMENU) Reporting System",
+    "App_Acronym": "APIMENU",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "X-Carline Chart"
+    "APP_NAME": "API FOCUS Pre-Paid Rent System",
+    "App_Acronym": "APIRENT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "WOW"
+    "APP_NAME": "API FOCUS Production Systems",
+    "App_Acronym": "APIPROD",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "X-Carline Chart"
+    "APP_NAME": "ARMIS: Account Receivable Misc. Invoicing System",
+    "App_Acronym": "ARMIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "Workforce One (WF1) - Kronos Workforce Central"
+    "APP_NAME": "ASR Systems & Infrastructure",
+    "App_Acronym": "ASR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "Workforce One (WF1) - Kronos Workforce Central"
+    "APP_NAME": "AXZ Plan System Mainframe",
+    "App_Acronym": "AXZ",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   },
   {
-    "APP_NAME": "Workforce One (WF1) - Kronos Workforce Central"
+    "APP_NAME": "AXZ Plan System Mainframe",
+    "App_Acronym": "AXZ",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
   },
   {
-    "APP_NAME": "X-Carline Chart"
+    "APP_NAME": "Account Distribution",
+    "App_Acronym": "ACCDIST",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Accounting - Centralized Check Writing",
+    "App_Acronym": "CCW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Accounting - Company Car & COMLIT",
+    "App_Acronym": "FCCC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Accounting - Customer EFT",
+    "App_Acronym": "CEFT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Accounting - Dealer EFT",
+    "App_Acronym": "DEFT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Accounting - GL Summarization",
+    "App_Acronym": "GL-Summ",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Accounting - Like Kind Exchange-CLIPS",
+    "App_Acronym": "CLIPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Accounting - Misc 1099",
+    "App_Acronym": "MISC1099",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Accounting - NAFO Account Recon",
+    "App_Acronym": "NAFORECON",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Adaptive Control Systems",
+    "App_Acronym": "ACS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Administration of Marketing and Sales",
+    "App_Acronym": "EuAS-AIMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Application Database Management and Services",
+    "App_Acronym": "ADM&S",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "As Built: As Built",
+    "App_Acronym": "ASBUILT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "As Built: As Built",
+    "App_Acronym": "ASBUILT",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Automated Image Management System-AIMS",
+    "App_Acronym": "AIMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Back Order",
+    "App_Acronym": "PS&L BO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Billing Platform",
+    "App_Acronym": "BP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Border Crossing System",
+    "App_Acronym": "BCS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Broadcast",
+    "App_Acronym": "VBC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Broadcast",
+    "App_Acronym": "VBC",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Bulk Mail",
+    "App_Acronym": "BULKMAIL",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CA-IDMS Facility D",
+    "App_Acronym": "IDMS D",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CBS: Customer Billing System",
+    "App_Acronym": "CBS158",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CBS: Customer Billing System",
+    "App_Acronym": "CBS158",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "CCAPS-NA Corporate Accounts Payables",
+    "App_Acronym": "CCAPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS  Inventory",
+    "App_Acronym": "CMMS INV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Hourly Material Requirements",
+    "App_Acronym": "CMMS HMRS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Manufacturing Vehicle Part Repository",
+    "App_Acronym": "CMMS MVP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Material Cost Accounting",
+    "App_Acronym": "CMMS MCA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS NG-Web",
+    "App_Acronym": "CMMS NG",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Obsolescence",
+    "App_Acronym": "CMMS OBSO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Open-To-Go Reporting",
+    "App_Acronym": "CMMS OTG",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Preproduction BOM",
+    "App_Acronym": "CMMS PRP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Receiving",
+    "App_Acronym": "CMMS RCV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Security Authorization Service",
+    "App_Acronym": "CMMS SAS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Supplier Releasing and Packaging",
+    "App_Acronym": "CMMS MSR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS Web-Enabled Direct Data Link",
+    "App_Acronym": "CMMS eDDL",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS3 Bridges/PACO&ILVS",
+    "App_Acronym": "EuMP-ILVS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CMMS3 Empress - Commodity Audit",
+    "App_Acronym": "CMMS EMP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "COLETTE - Travel Expense Administration System",
+    "App_Acronym": "EuAS-COLET",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "COMBAT",
+    "App_Acronym": "COMBAT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "COMBAT",
+    "App_Acronym": "COMBAT",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "CONCEPS Sales Entry",
+    "App_Acronym": "CSE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CPR II",
+    "App_Acronym": "EuAS-CPRII",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CRM Core -CuPID",
+    "App_Acronym": "Core-CuPID",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CVMS",
+    "App_Acronym": "CVMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CVMS",
+    "App_Acronym": "CVMS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Central Outbound Payment and Control",
+    "App_Acronym": "COPAC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Certificate of Conformity",
+    "App_Acronym": "COC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "China - Pinnacle Account Servicing Batch",
+    "App_Acronym": "FAFC-PASMF",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "China Account Manager",
+    "App_Acronym": "CAM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "CiTiS: Customs & International Trading Information",
+    "App_Acronym": "EuAS-CITIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Conceps",
+    "App_Acronym": "CN204",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Conceps",
+    "App_Acronym": "CN204",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Consignee Reconciliation",
+    "App_Acronym": "conrec",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Contest and Incentive Wizard (CIW)",
+    "App_Acronym": "CIW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Contest and Incentive Wizard (CIW)",
+    "App_Acronym": "CIW",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Control Of Requisitions and Approvals",
+    "App_Acronym": "CORA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Corporate Procurement and Receiving System (CPARS)",
+    "App_Acronym": "CPARS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Customer Experience",
+    "App_Acronym": "CX",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "DRIVE - Dealer Reporting Incentives & Vehicle Elig",
+    "App_Acronym": "DRIVE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "DRIVE - Dealer Reporting Incentives & Vehicle Elig",
+    "App_Acronym": "DRIVE",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Data Supply Chain",
+    "App_Acronym": "DSC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Dealer Billing",
+    "App_Acronym": "DLR Bill",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Dealer Information Database",
+    "App_Acronym": "DID",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Dealer Information Database",
+    "App_Acronym": "DID",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Dealer Information Systems Net Enabled",
+    "App_Acronym": "DISNE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Dealer Payment System",
+    "App_Acronym": "DPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Dealer Payment System",
+    "App_Acronym": "DPS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Debt Manager",
+    "App_Acronym": "DM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Direct Debit",
+    "App_Acronym": "EuAS-DDebi",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Direct Order Entry System",
+    "App_Acronym": "DOESII",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Direct Sales System",
+    "App_Acronym": "DrctSales",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Disputed Excess Transportation Charges",
+    "App_Acronym": "DETC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Distribution Reporting",
+    "App_Acronym": "DR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Distribution Reporting",
+    "App_Acronym": "DR",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Dollar Volume Reporting (DolVol)",
+    "App_Acronym": "DOLVOL",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Duck Creek",
+    "App_Acronym": "AMROClaims",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Duty Drawback",
+    "App_Acronym": "DDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ECDB - European Currency Database",
+    "App_Acronym": "EuAS-ECDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EEBPR",
+    "App_Acronym": "EEBPR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ELECTRONIC RAW MATERIALS ACQUISITION (ERMA)",
+    "App_Acronym": "eRMA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ERES",
+    "App_Acronym": "EuAS-ERES",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ESPARS : Extended Service Plan Analysis & Rpt sys",
+    "App_Acronym": "ESPARS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ESPARS : Extended Service Plan Analysis & Rpt sys",
+    "App_Acronym": "ESPARS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "ESPS:  Extended Service Plan System",
+    "App_Acronym": "ESPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ESPS:  Extended Service Plan System",
+    "App_Acronym": "ESPS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "EU KD Lot",
+    "App_Acronym": "EuMP-KDLOT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EUROPUCS - European Petrol Usage Control System",
+    "App_Acronym": "EuME-PUCS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EUROVAC",
+    "App_Acronym": "EuAS-VAC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EUROVIS - European Vehicle Information System",
+    "App_Acronym": "EuroVIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EUROVIS - European Vehicle Information System",
+    "App_Acronym": "EuroVIS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "EVAT",
+    "App_Acronym": "EuAS-eVAT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EVCS: European Vehicle Cost System",
+    "App_Acronym": null,
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EWOS - European Work Order System",
+    "App_Acronym": "EuAS-EWOS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EXTRAC: Excess Transportation Control",
+    "App_Acronym": "EuMP-EXTRA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Electronic Funds Transfer(EFT-CBS)",
+    "App_Acronym": "2003CBSEFT",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Electronic Funds Transfer(EFT-CBS)",
+    "App_Acronym": "2003CBSEFT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Electronic Parts Return System",
+    "App_Acronym": "EPRS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Electronic Pre-Delivery Inspection Database",
+    "App_Acronym": "ePDI DB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Electronic Pre-Delivery Inspection Database",
+    "App_Acronym": "ePDI DB",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Emergency Order Referral System",
+    "App_Acronym": "EORS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Emergency Order Referral System",
+    "App_Acronym": "EORS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Endevor",
+    "App_Acronym": "ENDV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Enterprise Data Warehouse Foundation",
+    "App_Acronym": "EDW - FDN",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Enterprise Data Warehouse-EDW",
+    "App_Acronym": "EDW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Euro-AP",
+    "App_Acronym": "EuAS-EurAP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "EuroMivis",
+    "App_Acronym": "EuAS-EMIVI",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "European Company Vehicle Management System",
+    "App_Acronym": "EuAS-EVMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "European Company Vehicle Management System",
+    "App_Acronym": "EuAS-EVMS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "European VBOM",
+    "App_Acronym": "EuMP-VBOM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "External Customs Interface",
+    "App_Acronym": "ECIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FAAS:  Ford As A Supplier",
+    "App_Acronym": "FAAS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FAAS:  Ford As A Supplier",
+    "App_Acronym": "FAAS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "FAD SRS - FAD Sales Reporting",
+    "App_Acronym": "FSR",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "FAD SRS - FAD Sales Reporting",
+    "App_Acronym": "FSR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FAFC Customer Preference Center",
+    "App_Acronym": "FAFCCPC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FAFC Pinnacle Table Maintenance Application",
+    "App_Acronym": "fafctma",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FAO-Industry:  FAO - Industry",
+    "App_Acronym": "FAO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FC Atlas",
+    "App_Acronym": "FC Atlas",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Account Manager",
+    "App_Acronym": "FCE-AM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE BOSS II (M/F Menu System Only)",
+    "App_Acronym": "BOSSII",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE CAS",
+    "App_Acronym": "CAS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Dealer Database",
+    "App_Acronym": "DLRDBASEAD",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Debt Manager",
+    "App_Acronym": "FCEDEBTMGR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE GDPdU Tax Archive",
+    "App_Acronym": "GDPDUTAX",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Lending Automotive",
+    "App_Acronym": "LA UKDEU",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Loan Processing System",
+    "App_Acronym": "FCE LPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Mainframe Proposal Processing",
+    "App_Acronym": "FCE MPP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Major Daily Rental Operations (MDRO)",
+    "App_Acronym": "FCE MDRO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Operational Reporting System",
+    "App_Acronym": "OPRPTSYS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Pinnacle Account Servicing",
+    "App_Acronym": "FCE PinASV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Pinnacle Account Servicing - Mainframe",
+    "App_Acronym": "FCE PinASV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Scope",
+    "App_Acronym": "FCE Scope",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Translog",
+    "App_Acronym": "TRANSLOG",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCE Workflow II",
+    "App_Acronym": "FCE WF II",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCNA Dealer API Service Layer",
+    "App_Acronym": "FCDLRAPI",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCSD Remanufacturing System",
+    "App_Acronym": "REMAN",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FCSD Remanufacturing System",
+    "App_Acronym": "REMAN",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "FIMPS:  Fleet Incentive Marketing Program System",
+    "App_Acronym": "FIMPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FIMPS:  Fleet Incentive Marketing Program System",
+    "App_Acronym": "FIMPS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "FITS: Financial Inventory Transaction System",
+    "App_Acronym": "FITS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FITS: Financial Inventory Transaction System",
+    "App_Acronym": "FITS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "FOCFPSD:FOCUS Ford Parts & Service Div.",
+    "App_Acronym": "FOCFPSD",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FOCFPSD:FOCUS Ford Parts & Service Div.",
+    "App_Acronym": "FOCFPSD",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "FORDSTAR Mainframe DCS Apps",
+    "App_Acronym": null,
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FPC: Finance Productivity Center",
+    "App_Acronym": "FPC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "FST-MPA: Manufacturing Parts Accounting",
+    "App_Acronym": "FST-MPA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Federal Order Management System",
+    "App_Acronym": "FOMS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Ford Credit Batch Management Tools",
+    "App_Acronym": "FCBMT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Command Center Monitoring Portal",
+    "App_Acronym": "FCCCMP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Communication Messaging Services-NA",
+    "App_Acronym": "FCCMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Customer Information Services",
+    "App_Acronym": "FCCIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Deal Optimizer",
+    "App_Acronym": "FCDO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Dealer Finance-DF",
+    "App_Acronym": "DF-FC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Dealer Toolkit",
+    "App_Acronym": "FCDT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Finance Analytical System-FCFAS",
+    "App_Acronym": "FCFAS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Mainframe",
+    "App_Acronym": "FFMC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Mainframe Technical Support",
+    "App_Acronym": "TECHSUPP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Receivable Account Information Service",
+    "App_Acronym": "FCRAIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Credit Treasury Insurance Risk System - TIRS",
+    "App_Acronym": "FCTIRS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Facing",
+    "App_Acronym": "FORDFACE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Facing",
+    "App_Acronym": "FORDFACE",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Ford Financial Teradata Costs - Production",
+    "App_Acronym": "FFTCP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Financial Teradata Costs -Test",
+    "App_Acronym": "FFTC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Pro : Vehicle Special Order System (VSO)",
+    "App_Acronym": "VSO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Pro : Vehicle Special Order System (VSO)",
+    "App_Acronym": "VSO",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Ford Pro: FIN Master",
+    "App_Acronym": "FIN",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Ford Pro: Fleet Operations Support System",
+    "App_Acronym": "FOSSY",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Ford Pro: Fleet Operations Support System",
+    "App_Acronym": "FOSSY",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Forms Add-on Database Entry-FADE",
+    "App_Acronym": "FADE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Funding Deal Compliance",
+    "App_Acronym": "GSFDC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GAPS",
+    "App_Acronym": "EuAS-GAPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GATES: Global Affiliate Trading and Export System",
+    "App_Acronym": "GATES",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GATES: Global Affiliate Trading and Export System",
+    "App_Acronym": "GATES",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GBO:  Global Buy Optimization",
+    "App_Acronym": "GBO: 11293",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GBO:  Global Buy Optimization",
+    "App_Acronym": "GBO: 11293",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GCAMP: Global Campaign Management System",
+    "App_Acronym": "GCAMP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GCAMP: Global Campaign Management System",
+    "App_Acronym": "GCAMP",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GCAT: Global Catalog",
+    "App_Acronym": "GCAT:11296",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GCQIS: Global Common Quality Indicator Sys",
+    "App_Acronym": "GCQIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GCQIS: Global Common Quality Indicator Sys",
+    "App_Acronym": "GCQIS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GDS:  Global Distribution System",
+    "App_Acronym": "GDS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GDS:  Global Distribution System",
+    "App_Acronym": "GDS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GEDI: Global EDI",
+    "App_Acronym": "EuMP-GEDI",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GEMSS (Global Engineering Management Support Sys)",
+    "App_Acronym": "GEMSS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GEVIS - Global Export Vehicle Info System",
+    "App_Acronym": "GEVIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GEVIS - Global Export Vehicle Info System",
+    "App_Acronym": "GEVIS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GIROBS:  GLOBAL INV REVIEW OBSOLESCENCE SYS",
+    "App_Acronym": "GIROBS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GIROBS:  GLOBAL INV REVIEW OBSOLESCENCE SYS",
+    "App_Acronym": "GIROBS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GLOBAL IMAGE VIEWER - DOCUMENT MANAGEMENT SERVICES",
+    "App_Acronym": "GIV-DMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GOASIS : Global Online Automotive Service Info Sys",
+    "App_Acronym": "GOASIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GOASIS : Global Online Automotive Service Info Sys",
+    "App_Acronym": "GOASIS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GOLFF-Generic Order Level Feature Forecasting",
+    "App_Acronym": "EuMP-GOLFF",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GOaLS - Global Ordering and Logistics System",
+    "App_Acronym": "GOaLS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GOaLS - Global Ordering and Logistics System",
+    "App_Acronym": "GOaLS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GPAM/GTFM",
+    "App_Acronym": "EuMP-GPAMG",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GPD Enhanced MSL",
+    "App_Acronym": "GEMSL",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GPPS/GPH: Global Part Pricing System/Pricing Hub",
+    "App_Acronym": "GPPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GPPS/GPH: Global Part Pricing System/Pricing Hub",
+    "App_Acronym": "GPPS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GPW: Global Parts Warehouse",
+    "App_Acronym": "GPW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GPW: Global Parts Warehouse",
+    "App_Acronym": "GPW",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GRMS Scoring Application",
+    "App_Acronym": "ORDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GSAR: Global System for Analytics & Reporting-AWS",
+    "App_Acronym": "GSAR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GSEVIN:  Global Secure Vehicle Info Sys",
+    "App_Acronym": "GSEVI11169",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GSLTS:  Global Service Labor Time Standards",
+    "App_Acronym": "GSLTS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GSLTS:  Global Service Labor Time Standards",
+    "App_Acronym": "GSLTS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "GWTS: Global Warranty Trends System",
+    "App_Acronym": "GWTS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "GWTS: Global Warranty Trends System",
+    "App_Acronym": "GWTS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Global Business Management Database",
+    "App_Acronym": "GBMDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global Business Management Database",
+    "App_Acronym": "GBMDB",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Global Collections System",
+    "App_Acronym": "FCGCS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global Common Finance Calculator",
+    "App_Acronym": "FCCFC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global Image Mainframe",
+    "App_Acronym": "GIMF",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global Lending Analysis System-GLAS",
+    "App_Acronym": "GLAS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global OnLine Dealer Database",
+    "App_Acronym": "GOLDD",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global OnLine Dealer Database",
+    "App_Acronym": "GOLDD",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Global Service Parts Packaging System",
+    "App_Acronym": "PS&L GSPPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global Service Parts Packaging System",
+    "App_Acronym": "PS&L GSPPS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Global Supplier Database",
+    "App_Acronym": "GSDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global Unified Contact Center Enterprise",
+    "App_Acronym": "GUCCE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Global Vehicle Programming",
+    "App_Acronym": "GVP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "HVBOM: Historical Vehicle Bill of Material",
+    "App_Acronym": "HVBOM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "HVBOM: Historical Vehicle Bill of Material",
+    "App_Acronym": "HVBOM",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "I/A Online:  IA-ONLINE",
+    "App_Acronym": "I/AONLIN",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ICE",
+    "App_Acronym": "ICE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ICPC: Inter / Intra Company Procurement cost",
+    "App_Acronym": "ICPC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "IT4IT Development Tools",
+    "App_Acronym": "FCIT4IT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Imagine - NBSC LTS",
+    "App_Acronym": "NBSC LTS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Incentive Single Input System Support",
+    "App_Acronym": "ISIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Incentive Single Input System Support",
+    "App_Acronym": "ISIS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Information Resource Center-IRC",
+    "App_Acronym": "IRC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Initial Stock Order",
+    "App_Acronym": "ISO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Inter-Company Settlements (ICS)",
+    "App_Acronym": "ICS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "KBS Mainframe NA",
+    "App_Acronym": "KBS MF NA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Knock Down LOT Set Order Management System",
+    "App_Acronym": "KDLOTSOM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Lending Automotive-LA Applications (FCNA and FAFC)",
+    "App_Acronym": "LA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Loan Origination Services",
+    "App_Acronym": "LOS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "M&S Executive Dashboard",
+    "App_Acronym": "EDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MCR: Material Cost Reporting",
+    "App_Acronym": "MCR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MCR: Material Cost Reporting",
+    "App_Acronym": "MCR",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "MD&R/PARMS",
+    "App_Acronym": "PARMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MEARS - Appropriation Request System",
+    "App_Acronym": "EuAS-MEARS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MITCOS: Material In Transit Control System",
+    "App_Acronym": "EuMP-MITCO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MMP: Materials Management Process",
+    "App_Acronym": "MMP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MMP: Materials Management Process",
+    "App_Acronym": "MMP",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "MOES",
+    "App_Acronym": "MOES",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MONEX",
+    "App_Acronym": "MONEX",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MRS: Management Reporting System",
+    "App_Acronym": "MRS98",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MRS: Management Reporting System",
+    "App_Acronym": "MRS98",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Magnum Credit Bureau Interface",
+    "App_Acronym": "CBI",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Mainframe Charges Facility E ",
+    "App_Acronym": "FACe",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Management, Analysis and Planning-MAPS MF",
+    "App_Acronym": "MAPS - MF",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Manufacturing Capacity Planning Volume System",
+    "App_Acronym": "MCPV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Market Offering Complexity Analysis (MOCA)",
+    "App_Acronym": "MOCA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Marketing Features Availability List",
+    "App_Acronym": "MFAL",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Marketing Return on Investment Datawarehouse",
+    "App_Acronym": "MROI DW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Master Part Number Registry",
+    "App_Acronym": "MPNR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Material Release",
+    "App_Acronym": "MR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Mech Spec System",
+    "App_Acronym": "MechSpec",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Mech Spec System",
+    "App_Acronym": "MechSpec",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Medium Truck:  Medium Truck VBOM",
+    "App_Acronym": "Mediu11306",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Misc. Interco. Settlements of Non-prod Mat. (MICS)",
+    "App_Acronym": "MICS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "My Next Vehicle",
+    "App_Acronym": "MNV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MyFordVehicles",
+    "App_Acronym": "MFV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "MyFordVehicles",
+    "App_Acronym": "MFV",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "NETS",
+    "App_Acronym": "EuAS-NETS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "NEW MIDAS: Marketing Incentive Dealer Audit System",
+    "App_Acronym": "MIDAS Rewr",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "NextGen DM",
+    "App_Acronym": "NextGen",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "North American Vehicle Information System",
+    "App_Acronym": "NAVIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "OVS - OPTIMISED VEHICLE SCHEDULING",
+    "App_Acronym": "OVS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "OVS - OPTIMISED VEHICLE SCHEDULING",
+    "App_Acronym": "OVS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "On-Line Stock Control and Re-ordering (OSCAR)",
+    "App_Acronym": "EuPS-OSCAR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Online Credit Application",
+    "App_Acronym": "OCA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Operations Management Systems",
+    "App_Acronym": "OMS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Operations Management Systems",
+    "App_Acronym": "OMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Order Control",
+    "App_Acronym": "OC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Order Control",
+    "App_Acronym": "OC",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Order Fulfillment Data Warehouse",
+    "App_Acronym": "OFM/DW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Order History",
+    "App_Acronym": "OHist",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Order History",
+    "App_Acronym": "OHist",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Order Mgmt Services / Single Order Bank",
+    "App_Acronym": "OMS/SOB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Order Processing",
+    "App_Acronym": "OPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Order Processing",
+    "App_Acronym": "OPS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Order Qualification System",
+    "App_Acronym": "OQS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PC: Material Mgmt - Part Control I/II",
+    "App_Acronym": "PC: M11317",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PC: Material Mgmt - Part Control I/II",
+    "App_Acronym": "PC: M11317",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "PCAM: Project Control / Asset Management",
+    "App_Acronym": "PCAM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PDB",
+    "App_Acronym": "EuAS-PDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PDSS:  Parts Decision Support System",
+    "App_Acronym": "PDSS:11320",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PDSS:  Parts Decision Support System",
+    "App_Acronym": "PDSS:11320",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "PEARS: Parts Entry and Recall System",
+    "App_Acronym": "PEARS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PEARS: Parts Entry and Recall System",
+    "App_Acronym": "PEARS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "PEDRO: Period Entry and Duty Relief Online",
+    "App_Acronym": "EuAS-PEDRO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "POPS: Part Order Processing System",
+    "App_Acronym": "POPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "POPS: Part Order Processing System",
+    "App_Acronym": "POPS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "PRIMAS",
+    "App_Acronym": "EuAS-PRIMA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PS&L Info Center",
+    "App_Acronym": "PSLIC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PS&L Info Center",
+    "App_Acronym": "PSLIC",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Parts Claims System",
+    "App_Acronym": "PCS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Parts Data Warehouse",
+    "App_Acronym": "PDW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Parts Data Warehouse",
+    "App_Acronym": "PDW",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Parts Income & Financial Analysis",
+    "App_Acronym": "PIFA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Parts Income & Financial Analysis",
+    "App_Acronym": "PIFA",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Parts Inventory Control",
+    "App_Acronym": "PMON",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Parts Order Processing",
+    "App_Acronym": "POPS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Payroll - US (HRIMS)",
+    "App_Acronym": "HRIMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Payroll-ES",
+    "App_Acronym": "FOS-Payrol",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Payroll-UK",
+    "App_Acronym": "EuAS_PayUK",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PeopleSoft (ASR) AR / BI",
+    "App_Acronym": "ASR AR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "PeopleSoft (ASR) GL",
+    "App_Acronym": "ASR GL",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Personal Lifetime Communication",
+    "App_Acronym": "PLC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Personnel Reporting Information System (PRISM)",
+    "App_Acronym": "PRISM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Physical VIN Generator - Gen Extract",
+    "App_Acronym": "EuMP-PVG",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle - Global Loan Origination",
+    "App_Acronym": "PinGLO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle - Global Tools Audit",
+    "App_Acronym": "PinnAudit",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle - Loan Origination Batch",
+    "App_Acronym": "DISC NBB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle - Office Foreign Asset Control Website",
+    "App_Acronym": "OFAC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle - Portfolio Toolbox",
+    "App_Acronym": "PTB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle - Smart VINCENT Middleware",
+    "App_Acronym": "PINN_SV_MW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle Account Servicing",
+    "App_Acronym": "PinnacleAS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle Account Servicing - China",
+    "App_Acronym": "PinASVChn",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle Account Servicing Batch",
+    "App_Acronym": "PASMF",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle Add-On Dealer Report",
+    "App_Acronym": "PinnDPR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle Common Logon",
+    "App_Acronym": "Logon",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle Loan Origination",
+    "App_Acronym": "PinnacleLO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle Security",
+    "App_Acronym": "Security",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Pinnacle Table Maintenance Application",
+    "App_Acronym": "TMA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Portfolio Transfer Application",
+    "App_Acronym": "PTA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Price Protection Entry System",
+    "App_Acronym": "PPES",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "ProPrima FDB",
+    "App_Acronym": "FDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Quality Reject Version II (QR 2)",
+    "App_Acronym": "QR2",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "RAPTOR",
+    "App_Acronym": "RAPTOR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "RTOM : Real Time Order Management System",
+    "App_Acronym": "RTOM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "RTOM : Real Time Order Management System",
+    "App_Acronym": "RTOM",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Rail Car Tracking",
+    "App_Acronym": "TRRIPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Rapid Referrals",
+    "App_Acronym": "RAPID",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Recognition and Anniversary Award (Engage2Excel)",
+    "App_Acronym": "Empl Award",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Remotely  Accessed Parts Info System IP",
+    "App_Acronym": "RAPID IP",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Remotely  Accessed Parts Info System IP",
+    "App_Acronym": "RAPID IP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Resource Management Group-RMG",
+    "App_Acronym": "RMG",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Retail Identification Program/Sign Ordering System",
+    "App_Acronym": "RIP/SOS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Retail Identification Program/Sign Ordering System",
+    "App_Acronym": "RIP/SOS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Retail and Lease Securitization",
+    "App_Acronym": "GSRLS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SAS:  Sales Agreement System",
+    "App_Acronym": "SAS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SAVE: Single Access to Vehicle",
+    "App_Acronym": "SAVE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SAVE: Single Access to Vehicle",
+    "App_Acronym": "SAVE",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "SBOM: Service Bill of Material",
+    "App_Acronym": "SBOM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SBOM: Service Bill of Material",
+    "App_Acronym": "SBOM",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "SCA-Customer",
+    "App_Acronym": "SCA-C",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SCC/Emerging Markets Forecasting & Scheduling",
+    "App_Acronym": "EuMP-SCC",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SCRA -Servicemembers Civil Relief Act",
+    "App_Acronym": "SCRA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SDPR:  Supplier Delivery Performance Rating",
+    "App_Acronym": "SDPR:11331",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SDPR:  Supplier Delivery Performance Rating",
+    "App_Acronym": "SDPR:11331",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "SLA: Service Loss Analysis",
+    "App_Acronym": "SLA",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SLA: Service Loss Analysis",
+    "App_Acronym": "SLA",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "SMARTS/MOCA - Sales Mgmnt Analysis & Rptg Tool",
+    "App_Acronym": "SMARTS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SMARTS/MOCA - Sales Mgmnt Analysis & Rptg Tool",
+    "App_Acronym": "SMARTS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "SNURK V.2.0",
+    "App_Acronym": "SNURK2",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SOE Amendment and Search",
+    "App_Acronym": "SAMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SOF Releases",
+    "App_Acronym": "SOFRELS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "SOF Releases",
+    "App_Acronym": "SOFRELS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "STARS2 Reporting Module (WebFocus)",
+    "App_Acronym": "STARS RPTS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "STARS2 Reporting Module (WebFocus)",
+    "App_Acronym": "STARS RPTS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "STARS:  Standardized Training and Resource System",
+    "App_Acronym": "STARS106",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "STARS:  Standardized Training and Resource System",
+    "App_Acronym": "STARS106",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Salary Timekeeping (NETSUS)",
+    "App_Acronym": "NETSUS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Sales Daily/Monthly",
+    "App_Acronym": "SLS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Service OVID",
+    "App_Acronym": "SOVID",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Service OVID",
+    "App_Acronym": "SOVID",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Service Purchasing Bill of Material",
+    "App_Acronym": "SPBOM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Single Order Edit",
+    "App_Acronym": "SOE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Smart VINCENT  2",
+    "App_Acronym": "SV2",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Smart VINCENT  2",
+    "App_Acronym": "SV2",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Special Requests Navis Mini",
+    "App_Acronym": "VS-SRNM",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Standard Cost",
+    "App_Acronym": "stancost",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Standard Cost",
+    "App_Acronym": "stancost",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Stock Administration Web Site",
+    "App_Acronym": "SAWS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Supercube",
+    "App_Acronym": "EuMP-SCUBE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Supplier Direct Ship",
+    "App_Acronym": "SDS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Supply On-Line Management Information System",
+    "App_Acronym": "SOLMIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Sys for NonProd On-Line Order Processing",
+    "App_Acronym": "SNOOPIE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "TACCS",
+    "App_Acronym": "EuHR-TACCS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "TER: Travel & Expense Reporting Online",
+    "App_Acronym": "TER",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Technical Field Operations Assignment Mgt Sys",
+    "App_Acronym": "TFOAMS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Technical Field Operations Assignment Mgt Sys",
+    "App_Acronym": "TFOAMS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Timekeeping and Work Orders (Hourly)",
+    "App_Acronym": "TWOS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Traceability: SAVE - Traceability",
+    "App_Acronym": "TRACE",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "U/SAP - FUS SAP SPM Solution (FCSD)",
+    "App_Acronym": "Phoenix",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "U/SAP - FUS SAP SPM Solution (FCSD)",
+    "App_Acronym": "Phoenix",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "UDB: Unified Data Base",
+    "App_Acronym": "UDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "UDB: Unified Data Base",
+    "App_Acronym": "UDB",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Used Vehicle Information System-UVIS",
+    "App_Acronym": "UVIS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "VI&D: Vehicle Invoicing & Drafting",
+    "App_Acronym": "VI&D",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "VMACS - Vehicle Monitoring and Control System",
+    "App_Acronym": "VMACS (EU)",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "VMACS - Vehicle Monitoring and Control System",
+    "App_Acronym": "VMACS (EU)",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "VOEDIT & Import System",
+    "App_Acronym": "VOEDIT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "VOEDIT & Import System",
+    "App_Acronym": "VOEDIT",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "VRDB - Vehicle Rptg DB",
+    "App_Acronym": "EuMP-VRDB",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Variable Data Label System",
+    "App_Acronym": "VDLS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Veh Schedule Control and Installation Record Sys",
+    "App_Acronym": "9270",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Veh Schedule Control and Installation Record Sys",
+    "App_Acronym": "9270",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Vehicle Commercial Invoice",
+    "App_Acronym": "VCI",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Vehicle Distribution and Reporting System",
+    "App_Acronym": "VNAV",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Vehicle Distribution and Reporting System",
+    "App_Acronym": "VNAV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Vehicle Incentive Data Service",
+    "App_Acronym": "VIDS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Vehicle Incentive Data Service",
+    "App_Acronym": "VIDS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Vehicle Incentives System",
+    "App_Acronym": "VINCENT",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "Vehicle Incentives System",
+    "App_Acronym": "VINCENT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Vehicle Special Ordering - MPL",
+    "App_Acronym": "eVSO",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Vehicle Title Document Systems",
+    "App_Acronym": "EuAS-VTD",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Vehicle Visibility",
+    "App_Acronym": "VVAppl",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Volume of Payments (VOP)",
+    "App_Acronym": "VOP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "WERS DB2 Adhoc",
+    "App_Acronym": "WERSDB2",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "WINS:  Wholesale Incentive System",
+    "App_Acronym": "WINS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "WINS:  Wholesale Incentive System",
+    "App_Acronym": "WINS",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "WIPS Ad Hoc Reporting",
+    "App_Acronym": "Ad Hoc",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Warehouse Entry System",
+    "App_Acronym": "WES",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Warranty Analytical Data Repository",
+    "App_Acronym": "WADR",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Wholesale Inventory Audit System-AiM Verify",
+    "App_Acronym": "IASAV",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Workflow II",
+    "App_Acronym": "WorkflowII",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Workflow Mainframe Suite",
+    "App_Acronym": "WF MF",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Workforce Profile",
+    "App_Acronym": "WFP",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Worldwide Engineering Release System",
+    "App_Acronym": "WERS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "Worldwide Integrated Purchasing System",
+    "App_Acronym": "WIPS",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "XNET",
+    "App_Acronym": "XNet",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "XUI-Cross Network Messaging User Interface",
+    "App_Acronym": "XUI",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "eCommitment",
+    "App_Acronym": "ECOMMIT",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
+  },
+  {
+    "APP_NAME": "eCommitment",
+    "App_Acronym": "ECOMMIT",
+    "Platform": "Mainframe - DB2",
+    "Platform_Consolidation": "Mainframe - DB2"
+  },
+  {
+    "APP_NAME": "ePCW (Part Cost and Weight on the web)",
+    "App_Acronym": "ePCW",
+    "Platform": "Mainframe",
+    "Platform_Consolidation": "Mainframe"
   }
 ]

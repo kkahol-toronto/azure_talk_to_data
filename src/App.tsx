@@ -28,6 +28,17 @@ interface Message {
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [sessionId, setSessionId] = useState<string>(() => {
+    // Try to get existing session ID from localStorage
+    const savedSessionId = localStorage.getItem('chatSessionId');
+    if (savedSessionId) {
+      return savedSessionId;
+    }
+    // Generate new session ID if none exists
+    const newSessionId = crypto.randomUUID();
+    localStorage.setItem('chatSessionId', newSessionId);
+    return newSessionId;
+  });
   const [status, setStatus] = useState<'waiting' | 'listening' | 'speaking' | 'processing'>('waiting');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -257,6 +268,7 @@ function App() {
     try {
       const formData = new FormData();
       formData.append('audio', audioBlob);
+      formData.append('session_id', sessionId);  // Add session ID to request
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
         body: formData,
