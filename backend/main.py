@@ -11,7 +11,7 @@ This module implements the FastAPI backend for the Conversational AI App. It pro
 Environment variables are loaded from a .env file. The backend is designed to work with a React frontend and uses CORS for security.
 """
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from openai import AzureOpenAI
 from dotenv import load_dotenv
@@ -25,9 +25,10 @@ import io
 import requests
 from datetime import datetime
 import shutil
-from data_processing import get_summary_response
+from data_processing import get_summary_response, conversational_sql_query, correct_transcription_terms
 from cosmodb_manager import add_request_response
 import uuid
+import subprocess
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -109,20 +110,20 @@ def save_to_temp(content, prefix, extension):
     return filepath
 
 @app.post("/api/chat")
-async def chat(audio: UploadFile = File(...), session_id: str = None):
+async def chat(audio: UploadFile = File(...), session_id: str = Form(None)):
     """Accepts an audio file, transcribes it, generates a summary response, and returns TTS audio."""
     try:
-        logger.info("Received audio file for processing")
+       # logger.info("Received audio file for processing")
         # Read the uploaded audio file
         content = await audio.read()
         # Save original audio
         original_audio_path = save_to_temp(content, "original_audio", "wav")
-        logger.info(f"Saved original audio to: {original_audio_path}")
+        #logger.info(f"Saved original audio to: {original_audio_path}")
         # Save the upload exactly as-is
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
             tmp.write(content)
             temp_audio_path = tmp.name
-        logger.info(f"Saved audio file to: {temp_audio_path}")
+        #logger.info(f"Saved audio file to: {temp_audio_path}")
         try:
             # Transcribe audio using Azure OpenAI Whisper
             whisper_url = (
@@ -150,19 +151,25 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
                 )
             if response.status_code == 200:
                 transcription = response.text
+                # Apply post-processing correction for domain-specific terms
+                transcription = correct_transcription_terms(transcription)
                 transcription_path = save_to_temp(transcription, "transcription", "txt")
-                logger.info(f"Saved transcription to: {transcription_path}")
-                logger.info(f"Transcription successful: {transcription}")
             else:
                 logger.error(f"Transcription failed with status {response.status_code}: {response.text}")
                 raise Exception(f"Transcription failed: {response.text}")
             # Generate or use provided session_id
             if not session_id:
                 session_id = str(uuid.uuid4())
-            # Get summary response from data_processing
-            summary_response = get_summary_response(transcription, session_id)
-            # Store request/response in CosmosDB
-            add_request_response(session_id, transcription, summary_response)
+            # Use conversational_sql_query to get SQL and result
+            result = conversational_sql_query(session_id, transcription)
+            sql = result.get("sql")
+            sql_result = result.get("answer")
+            sql_status = result.get("status")
+            sql_error_type = result.get("error_type")
+            sql_message = result.get("message")
+            # Get summary response from data_processing (optional, for TTS)
+            summary_response = get_summary_response(transcription, session_id, sql, sql_result)
+            # Store request/response in CosmosDB (already done in conversational_sql_query)
             # TTS via AOAI TTS endpoint (use summary_response)
             tts_url = (
                 f"{os.getenv('AZURE_OPENAI_TTS_ENDPOINT').rstrip('/')}"
@@ -184,12 +191,44 @@ async def chat(audio: UploadFile = File(...), session_id: str = None):
             tts_response.raise_for_status()
             audio_data = tts_response.content
             tts_audio_path = save_to_temp(audio_data, "tts_response", "wav")
+
+            # Check if the file is PCM WAV, and convert if not
+            def is_pcm_wav(filepath):
+                try:
+                    with wave.open(filepath, 'rb') as wf:
+                        return wf.getcomptype() == 'NONE'
+                except Exception as e:
+                    logger.warning(f"Could not check WAV type: {e}")
+                    return False
+
+            if not is_pcm_wav(tts_audio_path):
+                logger.info(f"TTS file {tts_audio_path} is not PCM WAV. Converting with ffmpeg...")
+                converted_path = tts_audio_path.replace('.wav', '_converted.wav')
+                ffmpeg_cmd = [
+                    'ffmpeg', '-y', '-i', tts_audio_path,
+                    '-ar', '16000', '-ac', '1', '-c:a', 'pcm_s16le', converted_path
+                ]
+                try:
+                    subprocess.run(ffmpeg_cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    with open(converted_path, 'rb') as f:
+                        audio_data = f.read()
+                    tts_audio_path = converted_path
+                    logger.info(f"TTS file converted to PCM WAV: {converted_path}")
+                except Exception as e:
+                    logger.error(f"ffmpeg conversion failed: {e}")
+                    # fallback: use original audio_data
+
             # Clean up temporary files
             os.unlink(temp_audio_path)
             logger.info("Cleaned up temporary files")
             return {
                 "session_id": session_id,
                 "response": summary_response,
+                "sql": sql,
+                "sql_result": sql_result,
+                "sql_status": sql_status,
+                "sql_error_type": sql_error_type,
+                "sql_message": sql_message,
                 "audio": audio_data.hex(),
                 "transcription": transcription,
                 "files": {

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Audio Interruption Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #status {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+    }
+    .meter {
+      height: 20px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    .meter-fill {
+      height: 100%;
+      background-color: purple;
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+  </style>
+</head>
+<body>
+  <h1>Audio Interruption Test</h1>
+  <p>This page tests interrupting TTS audio playback with microphone input.</p>
+  
+  <div>
+    <button id="startAudio">Play Sample Audio</button>
+    <button id="startVAD">Start Voice Detection</button>
+    <button id="stopAll">Stop Everything</button>
+    <input type="file" id="wavFileInput" accept="audio/wav" />
+    <button id="playWavFile">Play Selected WAV</button>
+  </div>
+  
+  <div id="status">Status: Idle</div>
+  
+  <div class="meter">
+    <div id="audioMeter" class="meter-fill"></div>
+  </div>
+  
+  <audio id="audioPlayer" class="hidden"></audio>
+  
+  <script>
+    // Global variables
+    let audioContext = null;
+    let micStream = null;
+    let micProcessor = null;
+    let audioPlayer = document.getElementById('audioPlayer');
+    let status = document.getElementById('status');
+    let audioMeter = document.getElementById('audioMeter');
+    let beepOscillator = null;
+    let beepAudioContext = null;
+    
+    // Sample audio URL - a TTS-like audio file
+    const sampleAudioUrl = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
+    // Configure buttons
+    document.getElementById('startAudio').addEventListener('click', playAudio);
+    document.getElementById('startVAD').addEventListener('click', startVAD);
+    document.getElementById('stopAll').addEventListener('click', stopEverything);
+    document.getElementById('playWavFile').addEventListener('click', function() {
+      const fileInput = document.getElementById('wavFileInput');
+      if (fileInput.files.length === 0) {
+        status.textContent = 'Status: Please select a WAV file first.';
+        return;
+      }
+      const file = fileInput.files[0];
+      const url = URL.createObjectURL(file);
+      if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+        audioPlayer.src = url;
+        audioPlayer.onended = () => {
+          status.textContent = 'Status: WAV playback finished';
+          URL.revokeObjectURL(url);
+        };
+        audioPlayer.play();
+        status.textContent = 'Status: Playing selected WAV file';
+      }
+    });
+    
+    // Play sample audio
+    function playAudio() {
+      // Stop any existing beep
+      if (beepOscillator) {
+        beepOscillator.stop();
+        beepOscillator = null;
+      }
+      if (beepAudioContext && beepAudioContext.state === "running") {
+        beepAudioContext.close();
+        beepAudioContext = null;
+      }
+
+      beepAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      beepOscillator = beepAudioContext.createOscillator();
+      beepOscillator.type = 'sine';
+      beepOscillator.frequency.setValueAtTime(440, beepAudioContext.currentTime);
+      beepOscillator.connect(beepAudioContext.destination);
+      beepOscillator.start();
+      status.textContent = 'Status: Playing audio';
+
+      setTimeout(() => {
+        if (beepOscillator) {
+          beepOscillator.stop();
+          beepOscillator = null;
+        }
+        if (beepAudioContext && beepAudioContext.state === "running") {
+          beepAudioContext.close();
+          beepAudioContext = null;
+        }
+        status.textContent = 'Status: Audio finished';
+      }, 3000);
+    }
+    
+    // Start voice activity detection
+    async function startVAD() {
+      status.textContent = 'Status: Starting voice detection...';
+      
+      try {
+        // Get microphone stream
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        micStream = stream;
+        
+        // Create audio context and processor
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaStreamSource(stream);
+        micProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+        
+        // Connect nodes
+        source.connect(micProcessor);
+        micProcessor.connect(audioContext.destination);
+        
+        // Process audio data for VAD
+        micProcessor.onaudioprocess = detectVoice;
+        
+        status.textContent = 'Status: Voice detection active';
+      } catch (error) {
+        console.error('Error starting VAD:', error);
+        status.textContent = 'Status: Error starting voice detection';
+      }
+    }
+    
+    // Detect voice in audio buffer
+    function detectVoice(event) {
+      const inputData = event.inputBuffer.getChannelData(0);
+      
+      // Calculate audio level (RMS)
+      const rms = Math.sqrt(
+        inputData.reduce((sum, sample) => sum + sample * sample, 0) / inputData.length
+      );
+      
+      // Update meter
+      audioMeter.style.width = Math.min(100, rms * 5000) + '%';
+      
+      // Check for voice (threshold)
+      if (rms > 0.02) {
+        console.log(`Voice detected! Level: ${rms.toFixed(4)}`);
+        
+        // If audio is playing, interrupt it
+        const audioElements = document.querySelectorAll('audio');
+        audioElements.forEach(audio => {
+          if (!audio.paused) {
+            console.log('Interrupting audio playback!');
+            audio.pause();
+            audio.currentTime = 0;
+            status.textContent = 'Status: Audio interrupted by voice';
+          }
+        });
+        
+        // Also try to interrupt the oscillator if it's playing
+        if (beepOscillator) {
+          beepOscillator.stop();
+          beepOscillator = null;
+          status.textContent = 'Status: Audio interrupted by voice';
+        }
+        if (beepAudioContext && beepAudioContext.state === "running") {
+          beepAudioContext.close();
+          beepAudioContext = null;
+        }
+      }
+    }
+    
+    // Stop everything
+    function stopEverything() {
+      // Stop audio playback
+      if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+      }
+      
+      // Stop VAD
+      if (micProcessor) {
+        micProcessor.disconnect();
+        micProcessor = null;
+      }
+      
+      // Stop microphone
+      if (micStream) {
+        micStream.getTracks().forEach(track => track.stop());
+        micStream = null;
+      }
+      
+      // Close audio context
+      if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+      }
+      
+      status.textContent = 'Status: Everything stopped';
+      audioMeter.style.width = '0%';
+    }
+  </script>
+</body>
+</html> 

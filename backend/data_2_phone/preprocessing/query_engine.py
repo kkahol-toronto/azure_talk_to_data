@@ -4,7 +4,7 @@ import glob
 import sqlite3
 import re
 from dotenv import load_dotenv
-from data_2_phone.preprocessing.process_excel import call_llm
+from backend.data_2_phone.preprocessing.process_excel import call_llm
 
 # Load environment variables
 load_dotenv()
@@ -110,12 +110,20 @@ def process_natural_language_query(nl_query):
     # Get environmental variable containing the prompt template
     sql_query_prompt = os.getenv("SQL_QUERY_PROMPT")
     
+    # Ensure last_user_query and last_assistant_answer are always defined
+    if 'last_user_query' not in locals():
+        last_user_query = ''
+    if 'last_assistant_answer' not in locals():
+        last_assistant_answer = ''
+    
     # Fill the prompt template with our data
     prompt = sql_query_prompt.format(
         nl_query=nl_query,
         table_name=TABLE_NAME,
         schema=", ".join(schema_info),
-        column_descriptions=json.dumps(column_descriptions, indent=2)
+        column_descriptions=json.dumps(column_descriptions, indent=2),
+        last_user_query=last_user_query,
+        last_assistant_answer=last_assistant_answer
     )
     
     # Call the LLM
@@ -140,48 +148,74 @@ def process_natural_language_query(nl_query):
         }
 
 def get_sql_and_answer(nl_query):
-    """
-    Given a natural language query, return (sql_query, sql_answer_str)
-    """
+    print("[DEBUG] >>> ENTERED get_sql_and_answer (query_engine.py)")
     result = process_natural_language_query(nl_query)
-    # Print the raw LLM response for debugging
-    if 'full_response' in result:
-        print("[DEBUG] Raw LLM response:\n", result['full_response'])
-    elif 'sql' not in result and 'error' in result:
-        print("[DEBUG] SQL generation error:", result['error'])
-
     sql_query = None
-    # Try to extract SQL robustly
-    if 'sql' in result:
-        sql_query = result['sql']
-    elif 'full_response' in result:
+    def clean_sql(sql):
+        sql = sql.strip()
+        sql = re.sub(r'(_END|SQL_END)\s*$', '', sql, flags=re.IGNORECASE).strip()
+        return sql
+    if 'full_response' in result:
         import re
-        # Try to extract from ```sql ... ```
-        match = re.search(r"```sql\s*(.*?)\s*```", result['full_response'], re.DOTALL | re.IGNORECASE)
+        content = result['full_response']
+        content = re.sub(r"(?im)^\s*sql\s*\n?", "", content)
+        content = content.replace('\xa0', ' ').replace('\r\n', '\n').replace('\r', '\n')
+        content = content.strip()
+        print("[DEBUG] Content before SQL extraction (query_engine):", repr(content))
+        match = re.search(r"\s*SQL_START\s*(.*?)\s*SQL_END", content, re.DOTALL | re.IGNORECASE)
         if match:
-            sql_query = match.group(1).strip()
-            print("[DEBUG] Extracted SQL from code block:", sql_query)
+            sql_query = clean_sql(match.group(1))
+            print("[DEBUG] Extracted SQL from SQL_START ... SQL_END (query_engine):", sql_query)
         else:
-            # Fallback: try to find first SELECT statement
-            match = re.search(r"(SELECT[\s\S]+?;)", result['full_response'], re.IGNORECASE)
+            match = re.search(r"<SQL>\s*(.*?)\s*</SQL>", content, re.DOTALL | re.IGNORECASE)
             if match:
-                sql_query = match.group(1).strip()
-                print("[DEBUG] Extracted SQL from SELECT fallback:", sql_query)
+                sql_query = clean_sql(match.group(1))
+                print("[DEBUG] Extracted SQL from <SQL> ... </SQL> (query_engine):", sql_query)
             else:
-                print("[DEBUG] Could not extract SQL from LLM response.")
-                sql_query = ""
+                match = re.search(r"```sql\s*(.*?)\s*```", content, re.DOTALL | re.IGNORECASE)
+                if match:
+                    sql_query = clean_sql(match.group(1))
+                    print("[DEBUG] Extracted SQL from code block (query_engine):", sql_query)
+                else:
+                    match = re.search(r"(SELECT[\s\S]+?;)", content, re.IGNORECASE)
+                    if match:
+                        sql_query = clean_sql(match.group(1))
+                        print("[DEBUG] Extracted SQL from SELECT fallback (query_engine):", sql_query)
+                    else:
+                        match = re.search(r"(SELECT[\s\S]+)", content, re.IGNORECASE)
+                        if match:
+                            sql_query = clean_sql(match.group(1))
+                            print("[DEBUG] Extracted SQL from SELECT fallback (no semicolon, query_engine):", sql_query)
+                        else:
+                            print("[DEBUG] Could not extract SQL from LLM response. (query_engine)")
+                            sql_query = ""
+    elif 'sql' in result:
+        print("[DEBUG] Extraction path: 'sql' in result")
+        sql_query = clean_sql(result['sql'])
     else:
+        print("[DEBUG] Extraction path: no sql or full_response in result")
         sql_query = ""
+    print("[DEBUG] SQL Query (from get_sql_and_answer):\n", sql_query)
 
-    # Format the answer as a string (customize as needed)
-    if 'results' in result and result['results']['success']:
-        sql_answer = json.dumps(result['results']['results'], indent=2)
-        print("[DEBUG] Generated SQL Query:\n", sql_query)
-        print("[DEBUG] SQL Answer/Response:\n", sql_answer)
-        return sql_query, sql_answer
+    if not sql_query or not sql_query.strip():
+        print("[DEBUG] No SQL query extracted. Returning error from get_sql_and_answer.")
+        return "", "Error: No SQL query could be extracted from the LLM response."
+
+    results = execute_query(sql_query)
+
+    if results and results.get('success'):
+        if results['results']:
+            sql_answer = json.dumps(results['results'], indent=2)
+            print("[DEBUG] Generated SQL Query:\n", sql_query)
+            print("[DEBUG] SQL Answer/Response:\n", sql_answer)
+            print("[DEBUG] Returning successful SQL and answer from get_sql_and_answer.")
+            return sql_query, sql_answer
+        else:
+            print("[DEBUG] SQL executed but returned no results. Returning from get_sql_and_answer.")
+            return sql_query, "Error: SQL executed but returned no results."
     else:
-        print("[DEBUG] SQL generation or execution failed:", result.get('error', 'Unknown error'))
-        return sql_query or "", f"Error: {result.get('error', 'Unknown error')}"
+        print("[DEBUG] SQL generation or execution failed. Returning from get_sql_and_answer:", results.get('error', 'Unknown error') if results else 'No results')
+        return sql_query or "", f"Error: {results.get('error', 'Unknown error') if results else 'No results'}"
 
 if __name__ == "__main__":
     # Check if database exists, if not suggest running excel_to_sqlite.py first
