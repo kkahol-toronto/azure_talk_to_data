@@ -13,8 +13,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-# Dynamically import query_engine.py from data_2_phone/preprocessing
-QUERY_ENGINE_PATH = os.path.join(os.path.dirname(__file__), '../data_2_phone/preprocessing/query_engine.py')
+# Dynamically import query_engine.py from backend/data_2_phone/preprocessing
+QUERY_ENGINE_PATH = os.path.join(os.path.dirname(__file__), 'data_2_phone/preprocessing/query_engine.py')
 spec = importlib.util.spec_from_file_location("query_engine", QUERY_ENGINE_PATH)
 query_engine = importlib.util.module_from_spec(spec)
 sys.modules["query_engine"] = query_engine

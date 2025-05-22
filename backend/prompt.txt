@@ -1,10 +1,29 @@
 Given the following conversation history, user query, generated SQL, and SQL answer, generate a helpful, spoken summary for the user. Keep it brief but provide important information. Further offer user suggestions on follow up questions or queries like 'Would you like to learn more about..' or 'let me know if you need more details on ...'. here is the 
 
 Conversation History:
-
+User: {'text': '\n'}
+Assistant: {'sql': 'SELECT "APP_NAME", COUNT(DISTINCT "App_ID") AS num_app_ids\nFROM applications\nGROUP BY "APP_NAME"\nORDER BY num_app_ids DESC\nLIMIT 20;', 'spoken': "Error executing SQL: 'last_user_query'"}
+User: {'text': 'Can you tell me about the Zebra Android scanner app?\n'}
+Assistant: {'sql': 'SELECT *\nFROM applications\nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\nLIMIT 50;', 'spoken': "Error executing SQL: 'last_user_query'"}
+User: {'text': 'can you tell me about the Zebra Android scanner app?\n'}
+Assistant: {'sql': 'SELECT * \nFROM applications \nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\n_END', 'spoken': 'Error executing SQL: near "_END": syntax error'}
+User: {'text': 'Thank you for watching.\n'}
+Assistant: {'sql': 'SELECT * \nFROM applications \nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\n_END', 'spoken': 'Error executing SQL: near "_END": syntax error'}
+User: {'text': 'Can you tell me about the Zebra Android scanner app?\n'}
+Assistant: {'sql': 'SELECT *\nFROM applications\nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\nLIMIT 25;', 'spoken': "Error executing SQL: name 'last_user_query' is not defined"}
+User: {'text': 'Can you tell me about the Zebra Android Scanner app?\n'}
+Assistant: {'sql': 'SELECT *\nFROM applications\nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\n_END', 'spoken': 'Error executing SQL: near "_END": syntax error'}
+User: {'text': 'Can you tell me about the Zebra Android Scanner app?\n'}
+Assistant: {'sql': 'SELECT * \nFROM applications\nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\n_END', 'spoken': 'Error executing SQL: near "_END": syntax error'}
+User: {'text': 'Can you tell me about the Zebra Android Scanner app?\n'}
+Assistant: {'sql': 'SELECT *\nFROM applications\nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\n_END', 'spoken': 'Error executing SQL: near "_END": syntax error'}
+User: {'text': '\n'}
+Assistant: {'sql': 'SELECT *\nFROM applications\nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\n_END', 'spoken': 'Error executing SQL: near "_END": syntax error'}
+User: {'text': 'Tell me about the Zebra Android Scanner app.\n'}
+Assistant: {'sql': 'SELECT *\nFROM applications\nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\n_END', 'spoken': 'Error executing SQL: near "_END": syntax error'}
 
 User Query:
-What's its app ID?
+That's it's app ID.
 
 
 SQL Answer:

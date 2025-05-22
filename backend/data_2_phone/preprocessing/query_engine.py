@@ -4,7 +4,7 @@ import glob
 import sqlite3
 import re
 from dotenv import load_dotenv
-from data_2_phone.preprocessing.process_excel import call_llm
+from backend.data_2_phone.preprocessing.process_excel import call_llm
 
 # Load environment variables
 load_dotenv()
