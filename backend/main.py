@@ -168,7 +168,7 @@ async def chat(audio: UploadFile = File(...), session_id: str = Form(None)):
             sql_error_type = result.get("error_type")
             sql_message = result.get("message")
             # Get summary response from data_processing (optional, for TTS)
-            summary_response = get_summary_response(transcription, session_id)
+            summary_response = get_summary_response(transcription, session_id, sql, sql_result)
             # Store request/response in CosmosDB (already done in conversational_sql_query)
             # TTS via AOAI TTS endpoint (use summary_response)
             tts_url = (

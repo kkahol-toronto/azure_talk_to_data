@@ -1,10 +1,11 @@
 import os
 from dotenv import load_dotenv
 from openai import AzureOpenAI
-from cosmodb_manager import get_last_n_pairs, add_request_response
+from cosmodb_manager import get_last_n_pairs, add_request_response, add_interaction, get_session
 import sys
 import importlib.util
 import re
+from prompt import SQL_QUERY_PROMPT, SPOKEN_ANSWER_SUMMARY_GENERATION_PROMPT
 
 load_dotenv()
 
@@ -36,21 +37,6 @@ DEFAULT_PROMPT = (
 )
 
 MAX_PROMPT_TOKENS = 1_000_000
-
-# New SQL query prompt with conversation history
-SQL_QUERY_PROMPT = '''
-You are an AI assistant that translates natural-language questions into SQL queries.
--- DATABASE INFORMATION --
-- Table name: {table_name}
-- Schema: {schema}
--- COLUMN DESCRIPTIONS (with example values) --
-{column_descriptions}
--- CONVERSATION HISTORY (most-recent first) --
-{conversation_history}
--- CURRENT USER QUERY --
-{nl_query}
-IMPORTANT: Use the exact column names and example values as shown above when generating SQL. If the user refers to a value that is similar to, but not exactly, an example value, map it to the closest valid value. Return only the SQL, inside a fenced code block: sql SELECT ... Do not include explanations, comments, or any text outside the SQL block.
-'''
 
 def estimate_tokens(text):
     return len(text) // 4
@@ -111,31 +97,34 @@ def correct_sql_terms(sql: str) -> str:
         sql = re.sub(rf"'\s*{wrong}\s*'", f"'{right}'", sql, flags=re.IGNORECASE)
     return sql
 
-def get_summary_response(user_query, session_id):
+def get_summary_response(user_query, session_id, sql, sql_answer):
     last_user_query = ''
     last_assistant_answer = ''
+    last_sql_where_clause = ''
     """
-    1. Use query_engine to get SQL and SQL answer for the user query.
+    1. Use the provided SQL and SQL answer for the user query.
     2. Retrieve last 10 Q&A pairs from CosmosDB.
     3. Build prompt with all context.
     4. Call Azure OpenAI to get summary response.
     5. Return summary response (text).
     """
-    # Step 1: Get SQL and SQL answer
-    sql, sql_answer = query_engine.get_sql_and_answer(user_query)
-
     # Step 2: Get last 10 Q&A pairs
     history_pairs = get_last_n_pairs(session_id, n=10)
     if history_pairs:
         last_user_query = history_pairs[-1][0]['text']['text']
         last_assistant_answer = history_pairs[-1][1]['text'].get('spoken', '')
+        last_sql = history_pairs[-1][1]['text'].get('sql', '')
+        import re
+        match = re.search(r'WHERE\s+(.*?)(?:\s+GROUP BY|\s+ORDER BY|\s+LIMIT|;|$)', last_sql, re.IGNORECASE | re.DOTALL)
+        if match:
+            last_sql_where_clause = match.group(1).strip()
     history_str = "\n".join([
         f"User: {q['text']}\nAssistant: {a['text']}" for q, a in history_pairs
     ])
 
     # Step 3: Always reload .env and fetch prompt template
     load_dotenv(override=True)
-    prompt_template = os.getenv("SPOKEN_ANSWER_SUMMARY_GENERATION_PROMPT", DEFAULT_PROMPT)
+    prompt_template = SPOKEN_ANSWER_SUMMARY_GENERATION_PROMPT
     # Use str.format for prompt substitution to avoid regex escape issues
     prompt = prompt_template.format(
         conversation_history=history_str,
@@ -143,7 +132,8 @@ def get_summary_response(user_query, session_id):
         sql=sql,
         answer=sql_answer,
         last_user_query=last_user_query,
-        last_assistant_answer=last_assistant_answer
+        last_assistant_answer=last_assistant_answer,
+        last_sql_where_clause=last_sql_where_clause
     )
 
     if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
@@ -154,7 +144,8 @@ def get_summary_response(user_query, session_id):
             sql=sql,
             answer=sql_answer,
             last_user_query=last_user_query,
-            last_assistant_answer=last_assistant_answer
+            last_assistant_answer=last_assistant_answer,
+            last_sql_where_clause=last_sql_where_clause
         )
     if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
         # Truncate SQL answer if still too long
@@ -164,7 +155,8 @@ def get_summary_response(user_query, session_id):
             sql=sql,
             answer="",
             last_user_query=last_user_query,
-            last_assistant_answer=last_assistant_answer
+            last_assistant_answer=last_assistant_answer,
+            last_sql_where_clause=last_sql_where_clause
         ))
         truncated_answer = sql_answer[:allowed_answer_len]
         prompt = prompt_template.format(
@@ -173,7 +165,8 @@ def get_summary_response(user_query, session_id):
             sql=sql,
             answer=truncated_answer,
             last_user_query=last_user_query,
-            last_assistant_answer=last_assistant_answer
+            last_assistant_answer=last_assistant_answer,
+            last_sql_where_clause=last_sql_where_clause
         )
 
     # Write the final prompt to a file for debugging
@@ -206,54 +199,59 @@ def get_sql_from_llm(prompt, deployment_name):
     )
     content = response.choices[0].message.content
 
-    content = re.sub(r"(?im)^\s*sql\s*\n?", "", content)
-    # Normalize whitespace and line endings
-    content = content.replace('\xa0', ' ').replace('\r\n', '\n').replace('\r', '\n')
-    content = content.strip()
-    print("[DEBUG] Content before SQL extraction:", repr(content))
+    # normalize spaces & line-endings
+    content = (
+        content
+        .replace('\xa0', ' ')
+        .replace('\r\n', '\n')
+        .replace('\r',   '\n')
+        .strip()
+    )
+    print("[DEBUG] Before stripping markers:", repr(content))
 
-    # Updated regex: allow for optional whitespace before SQL_START
-    match = re.search(r"\s*SQL_START\s*(.*?)\s*SQL_END", content, re.DOTALL | re.IGNORECASE)
-    if match:
-        print("[DEBUG] Extracted SQL from SQL_START ... SQL_END")
-        return match.group(1).strip()
+    # strip ANY of these: SQL_START, _START, SQL_END, END (case-insensitive)
+    content = re.sub(r'^(?:SQL_START|_START)\s*',     '', content, flags=re.IGNORECASE)
+    content = re.sub(r'\s*(?:SQL_END|END)\s*$',       '', content, flags=re.IGNORECASE)
 
-    match = re.search(r"<SQL>\s*(.*?)\s*</SQL>", content, re.DOTALL | re.IGNORECASE)
-    if match:
-        print("[DEBUG] Extracted SQL from <SQL> ... </SQL>")
-        return match.group(1).strip()
+    print("[DEBUG] After stripping markers:", repr(content))
+    return content
 
-    match = re.search(r"```sql\s*(.*?)\s*```", content, re.DOTALL | re.IGNORECASE)
-    if match:
-        print("[DEBUG] Extracted SQL from code block")
-        return match.group(1).strip()
-
-    match = re.search(r'(SELECT[\s\S]+?;)', content, re.IGNORECASE)
-    if match:
-        print("[DEBUG] Extracted SQL from SELECT fallback")
-        return match.group(1).strip()
-    match = re.search(r'(SELECT[\s\S]+)', content, re.IGNORECASE)
-    if match:
-        print("[DEBUG] Extracted SQL from SELECT fallback (no semicolon)")
-        return match.group(1).strip()
-
-    print("[DEBUG] No SQL extracted, returning raw content")
-    return content.strip()
+def format_conversation_history_from_interactions(interactions, n=5):
+    """
+    Format the last n interactions for the LLM prompt, most recent first.
+    Each interaction is formatted as:
+      Here was the query: {USER_REQUEST}
+      The LLM responded with the following query: {LLM_SQL_RESPONSE}
+      The query was executed on DB and gave: {SQL_DB_RESPONSE}
+      This led to the following Summary Request: {SUMMARY_REQUEST}
+      And this was the Summary Response read out: {SUMMARY_RESPONSE}
+    Each interaction is separated by a blank line.
+    """
+    lines = []
+    for interaction in reversed(interactions[-n:]):
+        lines.append(
+            f"Here was the query: {interaction.get('USER_REQUEST', '')}\n"
+            f"The LLM responded with the following query: {interaction.get('LLM_SQL_RESPONSE', '')}\n"
+            f"The query was executed on DB and gave: {interaction.get('SQL_DB_RESPONSE', '')}\n"
+            f"This led to the following Summary Request: {interaction.get('SUMMARY_REQUEST', '')}\n"
+            f"And this was the Summary Response read out: {interaction.get('SUMMARY_RESPONSE', '')}"
+        )
+    return "\n\n".join(lines)
 
 def conversational_sql_query(session_id, nl_query):
     last_user_query = ''
     last_assistant_answer = ''
+    last_sql_where_clause = ''
     print(f"[DEBUG] conversational_sql_query called with session_id: {session_id}")
     print("[DEBUG] Conversational SQL query started")
     from dotenv import load_dotenv
     load_dotenv(override=True)
-    sql_query_prompt = os.getenv("SQL_QUERY_PROMPT", SQL_QUERY_PROMPT)
+    sql_query_prompt = SQL_QUERY_PROMPT
     deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
 
     # Get table name, schema, and column descriptions from query_engine
     table_name = query_engine.TABLE_NAME
     schema = ', '.join(query_engine.get_database_schema()).replace('{', '{{').replace('}', '}}')
-    # Load column descriptions and append example values for key columns
     column_descriptions_dict = query_engine.load_column_descriptions()
     if isinstance(column_descriptions_dict, dict):
         if 'App_Acronym' in column_descriptions_dict and 'Example values' not in column_descriptions_dict['App_Acronym']:
@@ -264,32 +262,15 @@ def conversational_sql_query(session_id, nl_query):
     column_descriptions = column_descriptions.replace('{', '{{').replace('}', '}}')
     db_path = query_engine.DB_FILE
 
-    # Get conversation history
-    print(f"[DEBUG] Calling get_last_n_pairs with session_id: {session_id}")
-    history_pairs = get_last_n_pairs(session_id, n=10)
-    print(f"[DEBUG] Fetching history for session_id: {session_id}")
-    print(f"[DEBUG] Raw history pairs: {history_pairs}")
-    conversation_history = format_conversation_history(history_pairs)
-    if history_pairs:
-        last_user_query = history_pairs[-1][0]['text']['text']
-        last_assistant_answer = history_pairs[-1][1]['text'].get('spoken', '')
-    #write the conversation history to a file
-    with open("conversation_history.txt", "w") as f:
-        f.write(conversation_history)
+    # Fetch the session document and interactions
+    session = get_session(session_id)
+    interactions = session.get('interactions', []) if session else []
+    conversation_history = format_conversation_history_from_interactions(interactions, n=5)
 
     # Apply correction to the user query before LLM prompt
     nl_query = correct_transcription_terms(nl_query)
 
-    # Debug prints
-    # print("[DEBUG] Format keys:", {
-    #     "table_name": table_name,
-    #     "schema": schema,
-    #     "column_descriptions": column_descriptions,
-    #     "conversation_history": conversation_history,
-    #     "nl_query": nl_query
-    # })
-
-    # Build prompt
+    # Build the SQL generation prompt
     prompt = sql_query_prompt.format(
         table_name=table_name,
         schema=schema,
@@ -297,56 +278,15 @@ def conversational_sql_query(session_id, nl_query):
         conversation_history=conversation_history,
         last_user_query=last_user_query,
         last_assistant_answer=last_assistant_answer,
+        last_sql_where_clause=last_sql_where_clause,
         nl_query=nl_query
     )
-    if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
-        # Remove conversation history
-        prompt = sql_query_prompt.format(
-            table_name=table_name,
-            schema=schema,
-            column_descriptions=column_descriptions,
-            conversation_history="",
-            last_user_query=last_user_query,
-            last_assistant_answer=last_assistant_answer,
-            nl_query=nl_query
-        )
-    if estimate_tokens(prompt) > MAX_PROMPT_TOKENS:
-        # Truncate SQL answer if still too long (if needed)
-        prompt = sql_query_prompt.format(
-            table_name=table_name,
-            schema=schema,
-            column_descriptions=column_descriptions,
-            conversation_history="",
-            last_user_query=last_user_query,
-            last_assistant_answer=last_assistant_answer,
-            nl_query=nl_query
-        )
 
     # Call LLM to get SQL
     sql = get_sql_from_llm(prompt, deployment_name)
     print("[DEBUG] SQL to execute (pre-correction):", repr(sql))
-
-    # Post-process SQL to correct values
     sql = correct_sql_terms(sql)
     print("[DEBUG] SQL to execute (post-correction):", repr(sql))
-
-    # Check for empty or None SQL
-    if not sql or not sql.strip():
-        print("[DEBUG] Extracted SQL is empty or None.")
-        # Store Q&A pair with empty SQL and no spoken summary
-        print(f"[DEBUG] Calling add_request_response with session_id: {session_id}")
-        add_request_response(
-            session_id,
-            {"text": nl_query},
-            {"sql": sql, "spoken": None}
-        )
-        return {
-            "status": "error",
-            "error_type": "no_sql_extracted",
-            "message": "Error: No SQL query could be extracted from the LLM response.",
-            "sql": sql,
-            "answer": None
-        }
 
     # Execute SQL and get result
     import sqlite3
@@ -357,20 +297,45 @@ def conversational_sql_query(session_id, nl_query):
         rows = cursor.fetchall()
         print("[DEBUG] SQL execution result:", rows)
         conn.close()
-        # Generate spoken summary (call get_summary_response)
-        summary_response = get_summary_response(nl_query, session_id)
-        # Store Q&A pair in CosmosDB (store both SQL and spoken summary)
-        print(f"[DEBUG] Calling add_request_response with session_id: {session_id}")
-        add_request_response(
-            session_id,
-            {"text": nl_query},
-            {"sql": sql, "spoken": summary_response}
+        sql_db_response = str(rows)
+        print("[DEBUG] Converting SQL response to string:", repr(sql_db_response))
+        
+        # Build the summary prompt (as a string)
+        print("[DEBUG] Building summary prompt...")
+        summary_prompt = SPOKEN_ANSWER_SUMMARY_GENERATION_PROMPT.format(
+            conversation_history=conversation_history,
+            user_query=nl_query,
+            sql=sql,
+            answer=sql_db_response,
+            last_user_query=last_user_query,
+            last_assistant_answer=last_assistant_answer,
+            last_sql_where_clause=last_sql_where_clause
         )
+        print("[DEBUG] Summary prompt built successfully")
+        
+        # Generate spoken summary
+        print("[DEBUG] Generating summary response...")
+        summary_response = get_summary_response(nl_query, session_id, sql, sql_db_response)
+        print("[DEBUG] Summary response generated:", repr(summary_response))
+        
+        # Store the full interaction in CosmosDB
+        print("[DEBUG] Storing interaction in CosmosDB...")
+        add_interaction(
+            session_id,
+            user_request=nl_query,
+            llm_sql_response=sql,
+            sql_db_response=sql_db_response,
+            summary_request=summary_prompt,
+            summary_response=summary_response
+        )
+        print("[DEBUG] Interaction stored successfully")
+        
         if rows:
             return {
                 "status": "success",
                 "sql": sql,
-                "answer": rows
+                "answer": rows,
+                "spoken": summary_response
             }
         else:
             print("[DEBUG] SQL executed but returned no results.")
@@ -383,12 +348,24 @@ def conversational_sql_query(session_id, nl_query):
             }
     except Exception as e:
         print("[DEBUG] SQL execution error:", e)
-        # Store Q&A pair with SQL and error as spoken summary
-        print(f"[DEBUG] Calling add_request_response with session_id: {session_id}")
-        add_request_response(
+        # Build the summary prompt (as a string)
+        summary_prompt = SPOKEN_ANSWER_SUMMARY_GENERATION_PROMPT.format(
+            conversation_history=conversation_history,
+            user_query=nl_query,
+            sql=sql,
+            answer=f"Error executing SQL: {e}",
+            last_user_query=last_user_query,
+            last_assistant_answer=last_assistant_answer,
+            last_sql_where_clause=last_sql_where_clause
+        )
+        summary_response = get_summary_response(nl_query, session_id, sql, f"Error executing SQL: {e}")
+        add_interaction(
             session_id,
-            {"text": nl_query},
-            {"sql": sql, "spoken": f"Error executing SQL: {e}"}
+            user_request=nl_query,
+            llm_sql_response=sql,
+            sql_db_response=f"Error executing SQL: {e}",
+            summary_request=summary_prompt,
+            summary_response=summary_response
         )
         return {
             "status": "error",
