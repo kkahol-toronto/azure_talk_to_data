@@ -273,7 +273,7 @@ function App() {
       formData.append('audio', audioBlob);
       formData.append('session_id', sessionID); // Always include sessionID
       console.log('[SESSION] Sending sessionID with API call:', sessionID);
-      const response = await fetch('http://localhost:8000/api/chat', {
+      const response = await fetch('http://localhost:8000/api/chat', { //https://talk-to-data-backend-696666745246.us-central1.run.app
         method: 'POST',
         body: formData,
       });

@@ -23,7 +23,7 @@ User: {'text': 'Tell me about the Zebra Android Scanner app.\n'}
 Assistant: {'sql': 'SELECT *\nFROM applications\nWHERE LOWER("APP_NAME") LIKE \'%zebra android scanner%\'\n_END', 'spoken': 'Error executing SQL: near "_END": syntax error'}
 
 User Query:
-That's it's app ID.
+What's its app ID?
 
 
 SQL Answer:
